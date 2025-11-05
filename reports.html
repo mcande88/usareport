@@ -252,7 +252,7 @@ async function doLogin(){
   $("#btn-login").disabled = true;
 
   try{
-    const res = await apiPost({ action:"login", username:u, password:p });
+    const res = await apiPost('login', { username: u, password: p });
     if(res && res.ok){
       state.token = res.token; state.user = u; state.role = res.role || "user"; state.allowed = res.allowed || "*";
       saveSession(); paintUser();
@@ -293,12 +293,29 @@ async function runReport(){
   const date_to   = $("#date-to").value || null;
 
   try{
-    const res = await apiPost({ action:"report", token: state.token, form_type, date_from, date_to });
-    if(!res || !res.ok){ setStatus(status, (res && res.error) ? res.error : "Error loading report."); return; }
-    state.last.headers = res.headers || [];
-    state.last.rows = res.rows || [];
-    drawTable();
-    drawCharts(form_type);
+    // chama a rota 'list' da WebApp
+const res = await apiPost('list', { 
+  token: state.token, 
+  form: form_type,           // <- nome do formulário
+  from: date_from, 
+  to:   date_to 
+});
+
+if (!res || !res.ok){
+  setStatus(status, (res && res.error) ? res.error : "Error loading report.");
+  return;
+}
+
+// a API retorna: { ok:true, header:[...], rows:[{obj}, {obj}] }
+state.last.headers = res.header || res.headers || [];
+state.last.rows = (res.rows || []).map(obj => state.last.headers.map(h => obj[h] ?? ''));
+
+// (opcional) se quiser estatísticas do servidor:
+const stats = await apiPost('stats', { token: state.token, form: form_type });
+// você pode usar stats.byMonth / stats.byType nos gráficos, ou manter os gráficos locais
+
+drawTable();
+drawCharts(form_type);
     setStatus(status,"");
   }catch(e){
     setStatus(status,"Network error.");
@@ -425,5 +442,6 @@ boot();
 
 </body>
 </html>
+
 
 
