@@ -232,13 +232,16 @@ function paintUser(){
 }
 
 /* ===== API ===== */
-async function apiPost(route, data) {
-  const res = await fetch(`${ENDPOINT}?route=${route}`, {
+async function apiPost(route, payload){
+  const r = await fetch(`${ENDPOINT}?route=${encodeURIComponent(route)}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    // removemos o header Content-Type para evitar preflight OPTIONS
+    // headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload || {})
   });
-  return res.json();
+
+  const txt = await r.text();
+  try { return JSON.parse(txt); } catch { return { ok:false, error:"Bad JSON", raw:txt }; }
 }
 
 /* ===== LOGIN FLOW ===== */
@@ -441,6 +444,7 @@ boot();
 
 </body>
 </html>
+
 
 
 
