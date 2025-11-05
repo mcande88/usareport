@@ -232,11 +232,14 @@ function paintUser(){
 }
 
 /* ===== API ===== */
-async function apiPost(payload){
-  const r = await fetch(ENDPOINT, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
-  // Apps Script WebApp often returns 200/ok with body text; parse JSON safely
+async function apiPost(route, payload){
+  const r = await fetch(`${ENDPOINT}?route=${encodeURIComponent(route)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload || {})
+  });
   const txt = await r.text();
-  try{ return JSON.parse(txt); }catch{ return { ok:false, error:"Bad JSON", raw:txt }; }
+  try { return JSON.parse(txt); } catch { return { ok:false, error:"Bad JSON", raw:txt }; }
 }
 
 /* ===== LOGIN FLOW ===== */
@@ -422,4 +425,5 @@ boot();
 
 </body>
 </html>
+
 
