@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nursery Safety Reporting • ArborGen</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    :root{
+      --green:#2e7d32; --green-700:#1b5e20;
+      --bg:#e6f4ea; --card:#fff; --muted:#6b7280;
+      --border:#d1d5db;
+    }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:Arial,Helvetica,sans-serif; background:var(--bg); color:#111 }
+    a{ color:inherit; text-decoration:none }
+
+    /* Header */
+    header{ background:var(--green); color:#fff; padding:14px 20px; position:sticky; top:0; z-index:10 }
+    header .wrap{ max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:18px }
+    header h1{ font-size:18px; margin:0; font-weight:700 }
+    nav a{ margin-right:16px; padding:8px 10px; border-radius:8px; display:inline-block }
+    nav a.active, nav a:hover{ background:rgba(255,255,255,.18) }
+
+    /* Layout */
+    .layout{ max-width:1180px; margin:20px auto; display:grid; grid-template-columns:270px 1fr; gap:18px; padding:0 12px }
+    .sidebar{ background:var(--card); border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.08); padding:14px }
+    .sidebar h3{ margin:6px 0 10px; color:#374151; font-size:14px }
+    .menu{ display:flex; flex-direction:column; gap:8px }
+    .menu a{ background:#f3f6f4; border:1px solid var(--border); padding:12px; border-radius:10px }
+    .menu a:hover, .menu a.active{ background:#eaf4ec; border-color:#c6d8ca }
+
+    .content{ background:var(--card); border-radius:14px; box-shadow:0 0 12px rgba(0,0,0,.08); padding:20px }
+    h2{ margin:4px 0 6px; color:var(--green) }
+    p.lead{ color:#1f2937; margin-top:0 }
+    .muted{ color:var(--muted) }
+
+    /* Forms */
+    form{ display:grid; gap:12px }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    .row-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px }
+    .grid-two{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    label{ font-size:13px; color:#374151; margin-bottom:4px; display:block }
+    input, select, textarea, button{ width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; font-size:14px }
+    textarea{ min-height:90px; resize:vertical }
+    .inline{ display:flex; flex-wrap:wrap; gap:12px }
+    .hint{ font-size:12px; color:var(--muted) }
+    .btn{ background:var(--green); color:#fff; border:none; width:auto; padding:12px 16px; cursor:pointer; border-radius:10px }
+    .btn:hover{ background:var(--green-700) }
+    .btn[disabled]{ opacity:.6; cursor:not-allowed }
+    .card{ border:1px solid #e5e7eb; border-radius:12px; padding:14px }
+    .notice{ background:#f7fdf8; border-left:4px solid var(--green); padding:12px 12px 12px 14px; border-radius:8px }
+    .toolbar{ margin:8px 0 14px }
+    .btn-secondary{
+      display:inline-block; padding:10px 14px; border-radius:10px;
+      border:1px solid var(--border); background:#f3f6f4; color:#111;
+    }
+    .btn-secondary:hover{ background:#eaf4ec; border-color:#c6d8ca }
+
+    @media (max-width:920px){
+      .layout{ grid-template-columns:1fr }
+      .row, .row-3, .grid-two{ grid-template-columns:1fr }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Nursery Safety Reporting</h1>
+      <nav>
+        <a href="#/home" id="nav-home" class="active">Home</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h3>Report Types</h3>
+      <div class="menu">
+        <a href="#/employee" id="m-employee">Employee Incident</a>
+        <a href="#/supervisor" id="m-supervisor">Supervisor Investigation</a>
+        <a href="#/vehicle" id="m-vehicle">Vehicle Accident</a>
+        <a href="#/non-employee" id="m-non">Non-Employee Injury</a>
+        <a href="#/near-miss" id="m-nearmiss">Near-Miss Report</a>
+        <a href="reports.html" id="m-reports">Reports</a>
+      </div>
+    </aside>
+
+    <section class="content" id="view"><!-- content swaps here --></section>
+  </main>
+
+  <!-- ======================= TEMPLATES ======================= -->
+  <template id="tpl-home">
+    <div class="card">
+      <h2>Employee Safety — Reporting Matters</h2>
+      <p class="lead">
+        Use this portal to report incidents, near-misses, unsafe conditions, and motor vehicle accidents.
+        Timely reporting helps prevent injuries, correct hazards, and improve our processes.
+      </p>
+      <div class="notice">
+        <strong>Why report?</strong>
+        <ul>
+          <li>Identify hazards before they cause harm</li>
+          <li>Direct corrective actions and training</li>
+          <li>Strengthen our culture of safety</li>
+        </ul>
+        <p class="muted">Thank you for supporting a safe, productive workplace.</p>
+      </div>
+    </div>
+  </template>
+
+  <!-- Employee’s First Report -->
+  <template id="tpl-employee">
+    <h2>Employee’s First Report of Incident</h2>
+    <form data-form-type="employee_first">
+      <div class="row">
+        <div><label>Employee Name</label><input name="employee_name" required></div>
+        <div><label>Supervisor Name</label><input name="supervisor_name" required></div>
+      </div>
+
+      <div class="row">
+        <div><label>Job Title</label><input name="job_title" required></div>
+        <div><label>Date of Report</label><input type="date" name="date_of_report" required></div>
+      </div>
+
+      <div class="row-3">
+        <div><label>Location of Incident</label><input name="location" required></div>
+        <div><label>Date of Incident</label><input type="date" name="incident_date" required></div>
+        <div><label>Time</label><input type="time" name="incident_time" required></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Has your supervisor been made aware?</label>
+          <select name="supervisor_aware" required>
+            <option value="">Select…</option><option>Yes</option><option>No</option>
+          </select>
+        </div>
+        <div><label>Witnesses (if any)</label><input name="witnesses"></div>
+      </div>
+
+      <div><label>Incident Description (tasks and sequence of events)</label>
+        <textarea name="description" required></textarea></div>
+
+      <div><label>What could have been done to prevent this incident?</label>
+        <textarea name="prevention" required></textarea></div>
+
+      <div><label>What parts of your body were injured? (if applicable)</label>
+        <textarea name="injured_parts"></textarea></div>
+
+      <div class="row-3">
+        <div>
+          <label>Was medical treatment necessary?</label>
+          <select name="medical_needed">
+            <option value="">Select…</option><option>Yes</option><option>No</option>
+          </select>
+        </div>
+        <div><label>Hospital / Physician</label><input name="hospital"></div>
+        <div><label>Hospital / Physician Phone</label><input name="hospital_phone"></div>
+      </div>
+
+      <div class="row">
+        <div><label>Date of Visit</label><input type="date" name="visit_date"></div>
+        <div><label>Time of Visit</label><input type="time" name="visit_time"></div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Has this part of your body been injured before?</label>
+          <select name="prior_injury">
+            <option value="">Select…</option><option>Yes</option><option>No</option>
+          </select>
+        </div>
+        <div><label>If yes, when?</label><input type="date" name="prior_injury_date"></div>
+      </div>
+
+      <div class="row">
+        <div><label>Employee Signature</label><input name="employee_signature"></div>
+        <div><label>Date</label><input type="date" name="employee_signature_date"></div>
+      </div>
+
+      <div class="row">
+        <div><label>Supervisor Signature</label><input name="supervisor_signature"></div>
+        <div><label>Date</label><input type="date" name="supervisor_signature_date"></div>
+      </div>
+
+      <div><label>Attach Photo (optional)</label><input type="file" name="photo" accept="image/*"></div>
+
+      <button class="btn" type="submit" data-label="Submit report">Submit report</button>
+      <p class="hint" id="status"></p>
+    </form>
+  </template>
+
+  <!-- Supervisor Investigation -->
+  <template id="tpl-supervisor">
+    <h2>Supervisor’s Incident Investigation Report</h2>
+    <form data-form-type="supervisor_investigation">
+      <div class="row">
+        <div><label>Employee Name</label><input name="employee_name" required></div>
+        <div><label>Job Title</label><input name="job_title" required></div>
+      </div>
+
+      <div class="row">
+        <div><label>Department</label><input name="department" required></div>
+        <div><label>Business Unit</label><input name="business_unit"></div>
+      </div>
+
+      <div class="row">
+        <div><label>Length of Time on Job</label><input name="time_on_job" placeholder="e.g., 2 years"></div>
+        <div><label>Telephone</label><input name="telephone"></div>
+      </div>
+
+      <div class="row">
+        <div><label>Accident/Incident Address (Street)</label><input name="address_street" required></div>
+        <div><label>City, State, ZIP</label><input name="city_state_zip" required></div>
+      </div>
+
+      <div class="card">
+        <label>Accident Type (select all that apply)</label>
+        <div class="inline">
+          <label><input type="checkbox" name="accident_type" value="Struck against"> Struck against</label>
+          <label><input type="checkbox" name="accident_type" value="Struck by"> Struck by</label>
+          <label><input type="checkbox" name="accident_type" value="Caught in/between"> Caught in/between</label>
+          <label><input type="checkbox" name="accident_type" value="Fall on same level"> Fall on same level</label>
+          <label><input type="checkbox" name="accident_type" value="Fall to different level"> Fall to different level</label>
+          <label><input type="checkbox" name="accident_type" value="Slip/twist (not fall)"> Slip/twist (not fall)</label>
+          <label><input type="checkbox" name="accident_type" value="Exposure to temp. extremes"> Exposure to temp. extremes</label>
+          <label><input type="checkbox" name="accident_type" value="Skin exposure"> Skin exposure</label>
+          <label><input type="checkbox" name="accident_type" value="Contact electrical current"> Contact electrical current</label>
+          <label><input type="checkbox" name="accident_type" value="Muscular strain"> Muscular strain</label>
+          <label><input type="checkbox" name="accident_type" value="Respiratory exposure"> Respiratory exposure</label>
+          <label><input type="checkbox" name="accident_type" value="Exposure to physical agents"> Exposure to physical agents</label>
+          <label><input type="checkbox" name="accident_type" value="Other"> Other</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>HAZARD — A. Describe behavior prior to accident (cleaning, climbing, repairing, lifting, etc.)</label>
+        <textarea name="hazard_a" required></textarea>
+      </div>
+
+      <div class="card">
+        <label>HAZARD — B. Identify actions contributing to the accident (twist, push, crawl, stand, sit, reach, etc.)</label>
+        <textarea name="hazard_b" required></textarea>
+      </div>
+
+      <div class="card">
+        <label>CAUSE — Factors that contributed</label>
+        <div class="grid-two">
+          <label>Procedures</label><input name="cause_procedures">
+          <label>Hazard</label><input name="cause_hazard">
+          <label>Facilities/Equipment</label><input name="cause_facilities_equipment">
+          <label>Training</label><input name="cause_training">
+          <label>Communication</label><input name="cause_communication">
+          <label>In a Hurry</label><input name="cause_in_a_hurry">
+          <label>Other Factors</label><input name="cause_other_factors">
+        </div>
+      </div>
+
+      <div class="card">
+        <label>MAJOR CAUSE</label>
+        <div class="grid-two">
+          <label>Main Category</label><input name="major_cause" placeholder="People / Materials / Other">
+          <label>People</label><input name="major_cause_people">
+          <label>Materials</label><input name="major_cause_materials">
+          <label>Other</label><input name="major_cause_other">
+        </div>
+      </div>
+
+      <div class="card">
+        <label>ROOT CAUSE (5 Whys — summarize)</label>
+        <div class="grid-two">
+          <label>Event</label><textarea name="root_why_event"></textarea>
+          <label>Behavior</label><textarea name="root_why_behavior"></textarea>
+          <label>Condition</label><textarea name="root_why_condition"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>Corrective Actions</label>
+        <div class="grid-two">
+          <label>Eliminate Hazard</label><input name="corr_eliminate_hazard">
+          <label>Engineer / Design Out</label><input name="corr_engineer_design_out">
+          <label>Substitution</label><input name="corr_substitution">
+          <label>Training Needed</label><input name="corr_training_needed">
+          <label>PPE Needed</label><input name="corr_ppe_needed">
+        </div>
+      </div>
+
+      <div class="row">
+        <div><label>Supervisor Name</label><input name="supervisor_name" required></div>
+        <div><label>Date</label><input type="date" name="date_of_report" required></div>
+      </div>
+
+      <div><label>Attach Photo (optional)</label><input type="file" name="photo" accept="image/*"></div>
+
+      <button class="btn" type="submit" data-label="Submit investigation">Submit investigation</button>
+      <p class="hint" id="status"></p>
+    </form>
+  </template>
+
+  <!-- Vehicle Accident -->
+  <template id="tpl-vehicle">
+    <h2>Motor Vehicle Accident Report</h2>
+
+    <div class="toolbar">
+      <!-- Coloque How_to_Report_Vehicle_Accident.pdf na mesma pasta do site -->
+      <a class="btn-secondary" href="How_to_Report_Vehicle_Accident.pdf" target="_blank" rel="noopener">How to Report (instructions)</a>
+    </div>
+
+    <form data-form-type="vehicle_accident">
+      <fieldset class="card">
+        <legend>Accident Information</legend>
+        <div class="row-3">
+          <div><label>Date/Time of Accident</label><input type="datetime-local" name="accident_datetime" required></div>
+          <div><label>Driver Name</label><input name="driver_name" required></div>
+          <div><label>Telephone</label><input name="telephone"></div>
+        </div>
+        <div><label>Location of Accident (incl. cross streets, city, state)</label><input name="location" required></div>
+        <div><label>Accident Description (direction of travel, signals, road conditions, damage — do not speculate on cause)</label>
+          <textarea name="description" required></textarea></div>
+        <div><label>Diagram / notes</label><textarea name="diagram_notes"></textarea></div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>Other Vehicle #2</legend>
+        <div class="grid-two">
+          <label>Year/Make/Model</label><input name="ov2_year_make_model">
+          <label>Tag# / State</label><input name="ov2_tag_state">
+          <label>Driver Name</label><input name="ov2_driver_name">
+          <label>Driver’s License #</label><input name="ov2_driver_license">
+          <label>Address</label><input name="ov2_address">
+          <label>Telephone</label><input name="ov2_telephone">
+          <label>Insurance Co.</label><input name="ov2_insurance_co">
+          <label>Policy No.</label><input name="ov2_policy_no">
+        </div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>Other Vehicle #3</legend>
+        <div class="grid-two">
+          <label>Year/Make/Model</label><input name="ov3_year_make_model">
+          <label>Tag# / State</label><input name="ov3_tag_state">
+          <label>Driver Name</label><input name="ov3_driver_name">
+          <label>Address</label><input name="ov3_address">
+          <label>Telephone</label><input name="ov3_telephone">
+          <label>Insurance Co.</label><input name="ov3_insurance_co">
+          <label>Policy No.</label><input name="ov3_policy_no">
+        </div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>Injured Parties</legend>
+        <div class="grid-two">
+          <label>Injured Party #1 — Name/Address/Phone</label><input name="injured1_name_address_phone">
+          <label>Injured Party #2 — Name/Address/Phone</label><input name="injured2_name_address_phone">
+        </div>
+      </fieldset>
+
+      <fieldset class="card">
+        <legend>Witnesses & Police</legend>
+        <div><label>Witnesses (names/phones)</label><textarea name="witnesses_info"></textarea></div>
+        <div class="row-3">
+          <div><label>Police Officer</label><input name="police_officer_name"></div>
+          <div><label>Dept / Jurisdiction</label><input name="police_dept_jurisdiction"></div>
+          <div><label>Police Contact</label><input name="police_contact"></div>
+        </div>
+      </fieldset>
+
+      <div><label>Attach Photo (optional)</label><input type="file" name="photo" accept="image/*"></div>
+
+      <button class="btn" type="submit" data-label="Submit vehicle report">Submit vehicle report</button>
+      <p class="hint" id="status"></p>
+    </form>
+  </template>
+
+  <!-- Non-Company Injury -->
+  <template id="tpl-nonemployee">
+    <h2>Incident Report — Serious Injury to Non-Company Individuals</h2>
+    <form data-form-type="non_company_injury">
+      <div class="row">
+        <div>
+          <label>Is the injured person an ArborGen contractor?</label>
+          <select name="is_contractor" required>
+            <option value="">Select…</option><option>Yes</option><option>No</option>
+          </select>
+        </div>
+        <div><label>Date & Time of Injury</label><input type="datetime-local" name="injury_datetime" required></div>
+      </div>
+
+      <div class="row">
+        <div><label>Name of Injured Person</label><input name="injured_name" required></div>
+        <div><label>Contracting Company / Lessee (if applicable)</label><input name="company_lessee"></div>
+      </div>
+
+      <div><label>Type and Extent of Injury</label><textarea name="injury_type_extent" required></textarea></div>
+
+      <div class="row">
+        <div><label>Date ArborGen Representative Learned of Injury</label><input type="date" name="date_notified" required></div>
+        <div><label>Location where injury occurred</label><input name="location" required></div>
+      </div>
+
+      <div><label>Current Status of Injured Person (if known)</label><input name="current_status"></div>
+
+      <div><label>Additional Information about Injury</label><textarea name="additional_info"></textarea></div>
+
+      <fieldset class="card">
+        <legend>Attachments Checklist (mark when available)</legend>
+        <div class="inline">
+          <label><input type="checkbox" name="doc_contract_or_lease" value="Yes"> Contract or lease</label>
+          <label><input type="checkbox" name="doc_insurance_certificate" value="Yes"> Insurance certificate</label>
+          <label><input type="checkbox" name="doc_news_articles" value="Yes"> News articles</label>
+          <label><input type="checkbox" name="doc_location_map" value="Yes"> Location map</label>
+        </div>
+      </fieldset>
+
+      <div class="row">
+        <div><label>Report Completed By</label><input name="report_completed_by" required></div>
+        <div><label>Date</label><input type="date" name="report_date" required></div>
+      </div>
+
+      <div><label>Attach Photo (optional)</label><input type="file" name="photo" accept="image/*"></div>
+
+      <button class="btn" type="submit" data-label="Submit report">Submit report</button>
+      <p class="hint" id="status"></p>
+    </form>
+  </template>
+
+  <!-- Near Miss -->
+  <template id="tpl-nearmiss">
+    <h2>Near-Miss Report</h2>
+    <p class="muted">Report hazardous conditions or events with no injury that could have resulted in an accident.</p>
+
+    <form data-form-type="near_miss">
+      <div class="row">
+        <div>
+          <label>Location</label>
+          <select name="location" required>
+            <option value="">Choose a location…</option>
+            <option>Bellamy Seed Orchard</option>
+            <option>Bellville Nursery</option>
+            <option>Belville Seed Orchard</option>
+            <option>Blenheim Nursery</option>
+            <option>Bluff City Nursery</option>
+            <option>Bullard Nursery</option>
+            <option>Forest Seed Center</option>
+            <option>Jasper Nursery</option>
+            <option>Jasper Orchard</option>
+            <option>Livingston Nursery</option>
+            <option>Livingston Orchard</option>
+            <option>Ravenel Seed Orchard</option>
+            <option>Selma Nursery &amp; Orchard</option>
+            <option>Shellman Nursery</option>
+            <option>Summerville Headquarters</option>
+          </select>
+        </div>
+        <div><label>Building / Room / Work Area</label><input name="work_area" required></div>
+      </div>
+
+      <div class="row">
+        <div><label>Date of Near-Miss</label><input type="date" name="incident_date" required></div>
+        <div><label>Time</label><input type="time" name="incident_time" required></div>
+      </div>
+
+      <div><label>Witnesses (optional)</label><input name="witnesses"></div>
+
+      <div class="card">
+        <label>Type (check all that apply)</label>
+        <div class="inline">
+          <label><input type="checkbox" name="near_miss_type" value="Unsafe Act"> Unsafe Act</label>
+          <label><input type="checkbox" name="near_miss_type" value="Safety Policy Violation"> Safety Policy Violation</label>
+          <label><input type="checkbox" name="near_miss_type" value="Unsafe Condition of Area"> Unsafe Condition of Area</label>
+          <label><input type="checkbox" name="near_miss_type" value="Unsafe Condition of Equipment"> Unsafe Condition of Equipment</label>
+          <label><input type="checkbox" name="near_miss_type" value="Other"> Other</label>
+        </div>
+      </div>
+
+      <div><label>Describe the potential incident / hazard / concern</label>
+        <textarea name="description" required></textarea></div>
+
+      <div class="card">
+        <label>Were safety procedures violated? Could procedures be overlooked easily? (describe)</label>
+        <textarea name="procedures_violated" required></textarea>
+      </div>
+
+      <div class="card">
+        <label>Incident site inspection — Why was an unsafe act committed, or why was/is the unsafe condition present?</label>
+        <textarea name="site_inspection_reason" required></textarea>
+      </div>
+
+      <div class="card">
+        <label>Recommendations / steps to prevent a similar incident</label>
+        <textarea name="recommendations_steps" required></textarea>
+      </div>
+
+      <div class="row">
+        <div><label>Name (optional)</label><input name="reporter_name_optional"></div>
+        <div><label>Date Reported</label><input type="date" name="date_reported" required></div>
+      </div>
+
+      <div><label>Attach Photo (optional)</label><input type="file" name="photo" accept="image/*"></div>
+
+      <button class="btn" type="submit" data-label="Submit near-miss">Submit near-miss</button>
+      <p class="hint" id="status"></p>
+    </form>
+  </template>
+
+  <!-- ======================= APP SCRIPT HOOK ======================= -->
+  <script>
+    // ====== CONFIG (Apps Script endpoint) ======
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbz3j7YmfNM8EF9gacP2Du1N2j5vpZyLmRM1VihsOCj-Ab-uAmdNBqAa0dUagJjnmtaU/exec";
+
+    // ====== Simple hash router ======
+    const routes = {
+      '#/home': 'tpl-home',
+      '#/employee': 'tpl-employee',
+      '#/supervisor': 'tpl-supervisor',
+      '#/vehicle': 'tpl-vehicle',
+      '#/non-employee': 'tpl-nonemployee',
+      '#/near-miss': 'tpl-nearmiss'
+    };
+
+    function render(){
+      const hash = location.hash || '#/home';
+      const id = routes[hash] || 'tpl-home';
+
+      document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+      document.getElementById('nav-home')?.classList.toggle('active', hash==='#/home');
+
+      const tpl = document.getElementById(id).content.cloneNode(true);
+      const view = document.getElementById('view');
+      view.innerHTML='';
+      view.appendChild(tpl);
+
+      attachFormHandler(view);
+      prefillDates(view);
+    }
+
+    window.addEventListener('hashchange', render);
+    window.addEventListener('load', render);
+
+    function prefillDates(scope=document){
+      const today = new Date().toISOString().slice(0,10);
+      scope.querySelectorAll('input[type="date"]').forEach(i=>{ if(!i.value) i.value=today; });
+    }
+
+    // ====== Unified form handler (8s lock + messages + photo base64) ======
+    function attachFormHandler(root=document){
+      root.querySelectorAll('form[data-form-type]').forEach(form=>{
+        if (form.__bound) return;
+        form.__bound = true;
+
+        form.addEventListener('submit', async (e)=>{
+          e.preventDefault();
+
+          const btn   = form.querySelector('button[type="submit"]');
+          const msgEl = form.querySelector('#status') || form.appendChild(Object.assign(document.createElement('p'),{className:'hint', id:'status'}));
+
+          // hard lock 8s
+          btn.disabled = true;
+          const original = btn.getAttribute('data-label') || btn.textContent;
+          btn.textContent = 'Submitting…';
+          msgEl.textContent = 'Sending…';
+
+          const unlock = () => { btn.disabled = false; btn.textContent = original; };
+          setTimeout(unlock, 8000); // nunca antes de 8s
+
+          try{
+            const fd = new FormData(form);
+            const payload = { form_type: form.dataset.formType };
+
+            // photo -> base64
+            const file = fd.get('photo');
+            if (file && file.size > 0) payload.photo = await fileToBase64(file);
+
+            // map fields (handle checkbox arrays)
+            for (const [k,v] of fd.entries()){
+              if (k==='photo') continue;
+              const inputs = form.querySelectorAll(`[name="${CSS.escape(k)}"]`);
+              if (inputs.length > 1 && inputs[0].type === 'checkbox'){
+                payload[k] = [...inputs].filter(i=>i.checked).map(i=>i.value);
+              } else {
+                if (payload[k] !== undefined){
+                  if (!Array.isArray(payload[k])) payload[k] = [payload[k]];
+                  payload[k].push(v);
+                } else {
+                  payload[k] = v;
+                }
+              }
+            }
+
+            await fetch(ENDPOINT, {
+              method:'POST',
+              mode:'no-cors',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify(payload)
+            });
+
+            msgEl.textContent = 'Submitted successfully. Thank you.';
+            form.reset();
+            prefillDates(form); // repõe data de hoje após reset
+          }catch(err){
+            console.error(err);
+            msgEl.textContent = 'There was an error submitting your report. Please try again.';
+          }
+        });
+      });
+    }
+
+    function fileToBase64(file){
+      return new Promise((resolve,reject)=>{
+        const r = new FileReader();
+        r.onload = ()=> resolve(String(r.result).split(',')[1]);
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+    }
+  </script>
+</body>
+</html>

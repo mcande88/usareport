@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reports • ArborGen</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <style>
+    :root{
+      --green:#1f6b2a; --green-700:#185322; --bg:#ecf6ef; --card:#fff; --muted:#6b7280; --line:#e5e7eb;
+    }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif; background:var(--bg); color:#111 }
+    a{ color:inherit; text-decoration:none }
+    .wrap{ max-width:1200px; margin:0 auto; padding:0 16px }
+    header{ background:linear-gradient(0deg,var(--green),var(--green)); color:#fff; }
+    header .bar{ display:flex; align-items:center; justify-content:space-between; padding:16px 0 }
+    header h1{ margin:0; font-size:18px; font-weight:700; letter-spacing:.2px }
+    header .actions{ display:flex; gap:10px; align-items:center }
+    header .pill{ background:rgba(255,255,255,.15); padding:8px 12px; border-radius:999px; font-size:12px }
+    header button{ border:1px solid rgba(255,255,255,.35); background:transparent; color:#fff; padding:8px 12px; border-radius:10px; cursor:pointer }
+    header button:hover{ background:rgba(255,255,255,.12) }
+
+    main{ padding:24px 0 40px }
+    .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 1px 10px rgba(0,0,0,.04); padding:18px }
+    .grid{ display:grid; gap:16px }
+    .grid-2{ grid-template-columns: 1fr 1fr }
+    .grid-3{ grid-template-columns: 1fr 1fr 1fr }
+    @media (max-width:1024px){ .grid-2,.grid-3{ grid-template-columns:1fr } }
+
+    .panel{ display:grid; grid-template-columns: 280px 1fr; gap:16px }
+    @media (max-width:1024px){ .panel{ grid-template-columns:1fr } }
+
+    .side{ display:flex; flex-direction:column; gap:12px }
+    .side .group{ padding:14px; border:1px solid var(--line); border-radius:12px; background:#fafdfb }
+    .side h3{ margin:0 0 10px; font-size:13px; color:#27323a; font-weight:700 }
+    label{ font-size:13px; color:#374151; margin-bottom:6px; display:block }
+    select,input,button{ width:100%; padding:10px; border:1px solid var(--line); border-radius:10px; font-size:14px; background:#fff }
+    button.primary{ background:var(--green); color:#fff; border:none }
+    button.primary:hover{ background:var(--green-700); cursor:pointer }
+    button.ghost{ background:#fff; border:1px solid var(--line) }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+    .muted{ color:var(--muted) }
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap }
+    .toolbar button{ width:auto }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ padding:10px 12px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:top }
+    th{ text-align:left; color:#1f2937; background:#f7faf8; position:sticky; top:0 }
+    .table-wrap{ overflow:auto; max-height:520px; border:1px solid var(--line); border-radius:12px }
+    .status{ font-size:13px; color:var(--muted) }
+    .center{ text-align:center }
+    .loginbox{ max-width:420px; margin:70px auto; }
+    .brand{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+    .brand .dot{ width:12px; height:12px; background:var(--green); border-radius:4px }
+    .title{ margin:0 0 20px; font-size:22px; color:#183d24 }
+  </style>
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <h1>ArborGen • Safety Reports</h1>
+    <div class="actions">
+      <span id="who" class="pill" style="display:none"></span>
+      <button id="btn-logout" style="display:none">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <!-- Login -->
+  <div id="view-login" class="loginbox card" style="display:none">
+    <div class="brand"><div class="dot"></div><strong>Nursery Safety</strong></div>
+    <h2 class="title">Sign in to Reports</h2>
+    <div class="grid">
+      <div>
+        <label>Username</label>
+        <input id="login-user" autocomplete="username" />
+      </div>
+      <div>
+        <label>Password</label>
+        <input id="login-pass" type="password" autocomplete="current-password" />
+      </div>
+      <button id="btn-login" class="primary">Sign in</button>
+      <p id="login-status" class="status"></p>
+      <p class="muted">Use your ArborGen reporting credentials. Access is logged for audit purposes.</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="view-dash" style="display:none">
+    <div class="panel">
+      <div class="side">
+        <div class="group">
+          <h3>Report scope</h3>
+          <label>Form</label>
+          <select id="form-type">
+            <option value="employee_first">Employee Incident</option>
+            <option value="supervisor_investigation">Supervisor Investigation</option>
+            <option value="vehicle_accident">Motor Vehicle Accident</option>
+            <option value="non_company_injury">Non-Company Injury</option>
+            <option value="near_miss">Near-Miss Report</option>
+          </select>
+          <div class="row" style="margin-top:8px">
+            <div>
+              <label>From</label>
+              <input type="date" id="date-from">
+            </div>
+            <div>
+              <label>To</label>
+              <input type="date" id="date-to">
+            </div>
+          </div>
+          <button class="primary" id="btn-run" style="margin-top:10px">Run report</button>
+          <p id="run-status" class="status"></p>
+        </div>
+
+        <div class="group">
+          <h3>Export</h3>
+          <div class="toolbar">
+            <button class="ghost" id="btn-csv">Download CSV</button>
+            <button class="ghost" id="btn-pdf">Print / PDF</button>
+          </div>
+          <p class="status">Exports include current filters.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="grid grid-2">
+          <div class="card">
+            <canvas id="chart-month"></canvas>
+          </div>
+          <div class="card">
+            <canvas id="chart-loc"></canvas>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="toolbar" style="justify-content:space-between; margin-bottom:8px">
+            <strong id="table-title">Results</strong>
+            <span class="status" id="count"></span>
+          </div>
+          <div class="table-wrap">
+            <table id="tbl"><thead></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+/* ===== CONFIG ===== */
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbz3j7YmfNM8EF9gacP2Du1N2j5vpZyLmRM1VihsOCj-Ab-uAmdNBqAa0dUagJjnmtaU/exec"; 
+const STORAGE_KEY = "arbor_safety_token_v1";
+
+/* ===== STATE ===== */
+let state = {
+  token: null,
+  user: null,
+  role: null,
+  allowed: "*",
+  last: { headers: [], rows: [] },
+  charts: { month:null, loc:null }
+};
+
+/* ===== UTIL ===== */
+const $ = sel => document.querySelector(sel);
+function show(id){ $("#view-login").style.display="none"; $("#view-dash").style.display="none"; $(id).style.display="block"; }
+function setStatus(el, msg){ el.textContent = msg || ""; }
+
+/* group by helpers */
+function groupBy(arr, keyFn){
+  const m = new Map();
+  for (const r of arr){
+    const k = keyFn(r);
+    m.set(k, (m.get(k)||0)+1);
+  }
+  return [...m.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
+}
+function toCSV(headers, rows){
+  const esc = v => `"${String(v??'').replace(/"/g,'""')}"`;
+  const head = headers.map(esc).join(",");
+  const body = rows.map(r => r.map(esc).join(",")).join("\n");
+  return head + "\n" + body;
+}
+function download(filename, content, mime="text/plain"){
+  const blob = new Blob([content], {type:mime});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/* ===== AUTH ===== */
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    const obj = JSON.parse(raw);
+    state.token = obj.token;
+    state.user = obj.user;
+    state.role = obj.role;
+    state.allowed = obj.allowed;
+  }catch{}
+}
+function saveSession(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    token: state.token, user: state.user, role: state.role, allowed: state.allowed
+  }));
+}
+function clearSession(){
+  localStorage.removeItem(STORAGE_KEY);
+  state.token=null; state.user=null; state.role=null; state.allowed="*";
+}
+
+/* ===== RENDER ===== */
+function paintUser(){
+  const who = $("#who"), out = $("#btn-logout");
+  if(state.user){
+    who.style.display="inline-block";
+    out.style.display="inline-block";
+    who.textContent = `${state.user} • ${state.role}`;
+  }else{
+    who.style.display="none";
+    out.style.display="none";
+  }
+}
+
+/* ===== API ===== */
+async function apiPost(payload){
+  const r = await fetch(ENDPOINT, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+  // Apps Script WebApp often returns 200/ok with body text; parse JSON safely
+  const txt = await r.text();
+  try{ return JSON.parse(txt); }catch{ return { ok:false, error:"Bad JSON", raw:txt }; }
+}
+
+/* ===== LOGIN FLOW ===== */
+async function doLogin(){
+  const u = $("#login-user").value.trim();
+  const p = $("#login-pass").value;
+  const status = $("#login-status");
+  if(!u || !p){ setStatus(status,"Enter username and password."); return; }
+  setStatus(status,"Signing in...");
+  $("#btn-login").disabled = true;
+
+  try{
+    const res = await apiPost({ action:"login", username:u, password:p });
+    if(res && res.ok){
+      state.token = res.token; state.user = u; state.role = res.role || "user"; state.allowed = res.allowed || "*";
+      saveSession(); paintUser();
+      show("#view-dash");
+      initDates();
+      setStatus(status,"");
+    }else{
+      setStatus(status, res && res.error ? `Login failed: ${res.error}` : "Login failed.");
+    }
+  }catch(e){
+    setStatus(status,"Network error.");
+  }finally{
+    $("#btn-login").disabled = false;
+  }
+}
+
+/* ===== REPORT FLOW ===== */
+function initDates(){
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  const to = `${yyyy}-${mm}-${dd}`;
+  const frdate = new Date(today); frdate.setMonth(frdate.getMonth()-1);
+  const fmm = String(frdate.getMonth()+1).padStart(2,'0');
+  const fdd = String(frdate.getDate()).padStart(2,'0');
+  const fr = `${frdate.getFullYear()}-${fmm}-${fdd}`;
+  $("#date-from").value = fr;
+  $("#date-to").value = to;
+}
+async function runReport(){
+  const status = $("#run-status");
+  setStatus(status,"Loading...");
+  $("#btn-run").disabled = true;
+
+  const form_type = $("#form-type").value;
+  const date_from = $("#date-from").value || null;
+  const date_to   = $("#date-to").value || null;
+
+  try{
+    const res = await apiPost({ action:"report", token: state.token, form_type, date_from, date_to });
+    if(!res || !res.ok){ setStatus(status, (res && res.error) ? res.error : "Error loading report."); return; }
+    state.last.headers = res.headers || [];
+    state.last.rows = res.rows || [];
+    drawTable();
+    drawCharts(form_type);
+    setStatus(status,"");
+  }catch(e){
+    setStatus(status,"Network error.");
+  }finally{
+    $("#btn-run").disabled = false;
+  }
+}
+function drawTable(){
+  const thead = $("#tbl thead"), tbody = $("#tbl tbody");
+  const H = state.last.headers, R = state.last.rows;
+  $("#table-title").textContent = "Results";
+  $("#count").textContent = `${R.length} rows`;
+  thead.innerHTML = ""; tbody.innerHTML = "";
+  if(!H.length){ thead.innerHTML = "<tr><th>No data</th></tr>"; return; }
+
+  const trh = document.createElement("tr");
+  for(const h of H){
+    const th = document.createElement("th"); th.textContent = h; trh.appendChild(th);
+  }
+  thead.appendChild(trh);
+
+  for(const row of R){
+    const tr = document.createElement("tr");
+    row.forEach((val, idx)=>{
+      const td = document.createElement("td");
+      // detect URL (photo_url etc.)
+      const v = val==null ? "" : String(val);
+      if(/^https?:\/\//i.test(v)){
+        const a = document.createElement("a"); a.href=v; a.target="_blank"; a.textContent="open";
+        td.appendChild(a);
+      }else{
+        td.textContent = v;
+      }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+}
+function destroyChart(c){ if(c){ c.destroy(); } }
+function drawCharts(form_type){
+  const H = state.last.headers, R = state.last.rows;
+  if(!H.length || !R.length){ destroyChart(state.charts.month); destroyChart(state.charts.loc); return; }
+
+  // guess date column
+  const dateCols = ["incident_date","date_of_report","injury_datetime","accident_datetime","date_reported","report_date"];
+  let dIdx = -1;
+  for(const cand of dateCols){ const i = H.indexOf(cand); if(i>-1){ dIdx=i; break; } }
+  // guess location column
+  const locCols = ["location","work_area","city_state_zip","building","exact_location"];
+  let lIdx = -1;
+  for(const cand of locCols){ const i = H.indexOf(cand); if(i>-1){ lIdx=i; break; } }
+
+  const monthCounts = dIdx>-1 ? groupBy(R, r=>{
+    const raw = String(r[dIdx]||"");
+    const iso = raw.length>=10 ? raw.slice(0,10) : raw;
+    const d = new Date(iso);
+    if(isNaN(d)) return "Unknown";
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }) : [];
+
+  const locCounts = lIdx>-1 ? groupBy(R, r=>{
+    const v = String(r[lIdx]||"").trim();
+    return v || "Unspecified";
+  }) : [];
+
+  // Month chart
+  const ctxM = document.getElementById("chart-month").getContext("2d");
+  destroyChart(state.charts.month);
+  state.charts.month = new Chart(ctxM, {
+    type: "bar",
+    data: {
+      labels: monthCounts.map(x=>x[0]),
+      datasets: [{ label: "Records by month", data: monthCounts.map(x=>x[1]) }]
+    },
+    options: { plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  // Location chart (top 10)
+  const topL = locCounts.sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const ctxL = document.getElementById("chart-loc").getContext("2d");
+  destroyChart(state.charts.loc);
+  state.charts.loc = new Chart(ctxL, {
+    type: "bar",
+    data: {
+      labels: topL.map(x=>x[0]),
+      datasets: [{ label: "Top locations", data: topL.map(x=>x[1]) }]
+    },
+    options: { indexAxis:'y', plugins:{ legend:{ display:false } }, scales:{ x:{ beginAtZero:true } } }
+  });
+}
+
+/* ===== EXPORTS ===== */
+function exportCSV(){
+  if(!state.last.headers.length){ alert("No data to export."); return; }
+  const csv = toCSV(state.last.headers, state.last.rows);
+  const form = $("#form-type").options[$("#form-type").selectedIndex].text.replace(/\s+/g,'_');
+  download(`Report_${form}.csv`, csv, "text/csv;charset=utf-8");
+}
+function exportPDF(){
+  // simples: abre a caixa de impressão (usuário escolhe "Salvar como PDF")
+  window.print();
+}
+
+/* ===== BOOT ===== */
+function boot(){
+  // wire UI
+  $("#btn-login").addEventListener("click", doLogin);
+  $("#login-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+  $("#btn-run").addEventListener("click", runReport);
+  $("#btn-csv").addEventListener("click", exportCSV);
+  $("#btn-pdf").addEventListener("click", exportPDF);
+  $("#btn-logout").addEventListener("click", ()=>{
+    clearSession(); paintUser(); show("#view-login");
+  });
+
+  loadSession();
+  paintUser();
+
+  if(state.token){ show("#view-dash"); initDates(); }
+  else{ show("#view-login"); }
+}
+boot();
+</script>
+
+</body>
+</html>
