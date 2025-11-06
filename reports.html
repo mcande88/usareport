@@ -3,103 +3,164 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ArborGen • Safety Reports (Premium)</title>
+  <title>ArborGen • Safety Reports</title>
   <link rel="icon" type="image/png" href="icon.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      /* ArborGen greens */
-      --primary:#1a472a;      /* deep green */
-      --primary-600:#165024;  /* hover */
-      --accent:#2d6a4f;       /* lighter green for accents */
-      --bg:#f4fbf7;
+      /* Paleta do index */
+      --green:#2e7d32;
+      --green-700:#1b5e20;
+      --bg:#e6f4ea;
       --card:#ffffff;
-      --text:#1f2937;
+      --text:#111;
       --muted:#6b7280;
-      --border:#e5e7eb;
-      --shadow:0 6px 18px rgba(0,0,0,.06);
-      --radius:12px;
+      --border:#d1d5db;
+      --shadow:0 0 12px rgba(0,0,0,.08);
+      --radius:14px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1400px;margin:0 auto;padding:0 20px}
-
-    header{background:linear-gradient(135deg,var(--primary),#0f2e1a);color:#fff;position:sticky;top:0;z-index:20;box-shadow:var(--shadow)}
-    header .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
-    header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px}
-    header .actions{display:flex;gap:10px;align-items:center}
-    header .pill{background:rgba(255,255,255,.15);padding:6px 10px;border-radius:999px;font-size:12px}
-    header button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
-    header button:hover{background:rgba(255,255,255,.12)}
-
-    main{padding:26px 0 40px}
-    .grid{display:grid;gap:18px}
-    .panel{display:grid;grid-template-columns:300px 1fr;gap:20px}
-    @media (max-width:1024px){.panel{grid-template-columns:1fr}}
-
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .card .head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .card .title{font-weight:700}
-    .card .body{padding:16px}
-
-    .side{display:flex;flex-direction:column;gap:18px}
-    .group{border:1px solid var(--border);border-radius:10px;background:#fff}
-    .group h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:#0f2e1a;text-transform:uppercase;letter-spacing:.3px}
-    .group .box{padding:14px}
-    label{display:block;font-size:13px;font-weight:600;margin:6px 0 6px}
-    select,input[type="text"],input[type="date"],input[type="password"],input[type="number"],textarea{
-      width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:14px
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
-    select:focus, input:focus, textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.12)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .muted{color:var(--muted);font-size:13px}
+    a{ color:inherit; text-decoration:none }
+    .wrap{ max-width:1180px; margin:0 auto; padding:0 12px }
 
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;font-weight:600}
-    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-    .btn.primary:hover{background:var(--primary-600)}
-    .btn.ghost{background:#fff}
-    .btn.danger{background:#b91c1c;border-color:#b91c1c;color:#fff}
-    .note{font-size:12px;color:var(--muted)}
+    /* Header igual ao index */
+    header{
+      background:var(--green);
+      color:#fff;
+      position:sticky;
+      top:0; z-index:10;
+      box-shadow:var(--shadow);
+    }
+    header .bar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    header h1{ margin:0; font-size:18px; font-weight:700 }
+    nav{ display:flex; gap:10px; align-items:center }
+    nav a{
+      padding:8px 10px; border-radius:8px; display:inline-block;
+      background:transparent; color:#fff; border:1px solid transparent;
+    }
+    nav a:hover, nav a.active{
+      background:rgba(255,255,255,.18);
+    }
+    .pill{
+      background:rgba(255,255,255,.18);
+      padding:6px 10px; border-radius:999px; font-size:12px
+    }
+    header button{
+      border:1px solid rgba(255,255,255,.35);
+      background:transparent; color:#fff;
+      padding:8px 12px; border-radius:8px; cursor:pointer
+    }
+    header button:hover{ background:rgba(255,255,255,.12) }
 
-    .table-wrap{border:1px solid var(--border);border-radius:10px;overflow:auto;max-height:520px}
-    table{width:100%;border-collapse:collapse;min-width:840px}
-    th,td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
-    th{position:sticky;top:0;background:#f6fbf8;font-size:12px;text-transform:uppercase;z-index:1}
-    tr:hover{background:#f9fcfa}
-    td[contenteditable="true"]{outline:none;border-radius:6px}
-    td.pending{background:#fff7e6;box-shadow:inset 0 0 0 2px #fde68a}
-    .row-actions{white-space:nowrap;display:flex;gap:6px}
+    main{ padding:22px 0 34px }
 
-    /* Charts stacked vertically (no sideways scroll) */
-    .charts{display:flex;flex-direction:column;gap:18px}
-    .chart-card{padding:16px 12px}
-    .chart-holder{position:relative;height:320px}
+    /* Cartões e painéis no estilo do index */
+    .panel{ display:grid; grid-template-columns:300px 1fr; gap:18px }
+    @media (max-width:1024px){ .panel{ grid-template-columns:1fr } }
 
-    /* Modals */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
-    .modal .win{background:#fff;border-radius:12px;max-width:720px;width:100%;max-height:90vh;overflow:auto;border:1px solid var(--border);box-shadow:var(--shadow)}
-    .win .head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .win .body{padding:16px}
-    .win .foot{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
-    .col-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    @media (max-width:560px){.col-list{grid-template-columns:1fr}}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .card .head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex; justify-content:space-between; align-items:center
+    }
+    .card .title{ font-weight:700; color:var(--green) }
+    .card .body{ padding:16px }
+    .muted{ color:var(--muted); font-size:13px }
 
-    /* Print CSS (PDF) */
+    .side{ display:flex; flex-direction:column; gap:18px }
+    .group{ border:1px solid var(--border); border-radius:10px; background:#fff }
+    .group h3{
+      margin:0; padding:12px 14px; border-bottom:1px solid var(--border);
+      font-size:14px; color:#374151
+    }
+    .group .box{ padding:14px }
+
+    label{ display:block; font-size:13px; color:#374151; margin:6px 0 6px; font-weight:600 }
+    select, input[type="text"], input[type="date"], input[type="password"], input[type="number"], textarea{
+      width:100%; padding:10px 12px; border:1px solid var(--border);
+      border-radius:8px; background:#fff; font-size:14px
+    }
+    select:focus, input:focus, textarea:focus{
+      outline:none; border-color:#c6d8ca; box-shadow:0 0 0 3px rgba(46,125,50,.12)
+    }
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+
+    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+      background:#f3f6f4; color:#111; cursor:pointer; font-weight:600
+    }
+    .btn:hover{ background:#eaf4ec; border-color:#c6d8ca }
+    .btn.primary{ background:var(--green); color:#fff; border-color:var(--green) }
+    .btn.primary:hover{ background:var(--green-700) }
+    .btn.danger{ background:#b91c1c; border-color:#b91c1c; color:#fff }
+    .note{ font-size:12px; color:var(--muted) }
+
+    .grid{ display:grid; gap:18px }
+
+    .table-wrap{
+      border:1px solid var(--border);
+      border-radius:10px; overflow:auto; max-height:520px
+    }
+    table{ width:100%; border-collapse:collapse; min-width:840px }
+    th,td{ padding:10px 12px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:top }
+    th{
+      position:sticky; top:0; background:#f7fbf8;
+      font-size:12px; text-transform:uppercase; z-index:1
+    }
+    tr:hover{ background:#f9fcfa }
+    td[contenteditable="true"]{ outline:none; border-radius:6px }
+    td.pending{ background:#fff7e6; box-shadow:inset 0 0 0 2px #fde68a }
+    .row-actions{ white-space:nowrap; display:flex; gap:6px }
+
+    /* Gráficos em pilha (como no index) */
+    .charts{ display:flex; flex-direction:column; gap:18px }
+    .chart-card{ padding:16px 12px }
+    .chart-holder{ position:relative; height:320px }
+
+    /* Modais */
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:50; padding:20px }
+    .modal .win{
+      background:#fff; border-radius:12px; max-width:720px; width:100%;
+      max-height:90vh; overflow:auto; border:1px solid var(--border); box-shadow:var(--shadow)
+    }
+    .win .head{ padding:14px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center }
+    .win .body{ padding:16px }
+    .win .foot{ padding:12px 16px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px }
+    .col-list{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+    @media (max-width:560px){ .col-list{ grid-template-columns:1fr } }
+
+    /* Print (PDF) */
     @media print{
-      header, .side, .controls, .note {display:none!important}
-      .wrap{max-width:none;padding:0}
-      main{padding:0}
-      .panel{grid-template-columns:1fr!important;gap:0}
-      .card{border:none;box-shadow:none}
-      .table-wrap{max-height:none;border:1px solid #000}
-      th,td{border:1px solid #000}
-      .chart-card{page-break-inside:avoid}
-      .chart-skip{display:none!important}
+      header, .side, .controls, .note { display:none!important }
+      .wrap{ max-width:none; padding:0 }
+      main{ padding:0 }
+      .panel{ grid-template-columns:1fr!important; gap:0 }
+      .card{ border:none; box-shadow:none }
+      .table-wrap{ max-height:none; border:1px solid #000 }
+      th,td{ border:1px solid #000 }
+      .chart-card{ page-break-inside:avoid }
+      .chart-skip{ display:none!important }
     }
   </style>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -107,16 +168,19 @@
 <header>
   <div class="wrap bar">
     <h1>ArborGen • Safety Reports</h1>
-    <div class="actions">
+    <nav>
+      <!-- Home para voltar ao index -->
+      <a href="index.html" id="nav-home">Home</a>
+      <a href="#" class="active">Reports</a>
       <span id="who" class="pill" style="display:none"></span>
       <button id="btn-logout" style="display:none">Sign out</button>
-    </div>
+    </nav>
   </div>
 </header>
 
 <main class="wrap" id="app">
   <!-- LOGIN -->
-  <div id="view-login" class="card" style="max-width:420px;margin:60px auto">
+  <div id="view-login" class="card" style="max-width:420px;margin:40px auto">
     <div class="head"><div class="title">Sign in</div></div>
     <div class="body">
       <label>Username</label>
@@ -181,9 +245,9 @@
         </div>
       </div>
 
-      <!-- CONTENT -->
+      <!-- CONTEÚDO -->
       <div class="grid">
-        <!-- TABLE -->
+        <!-- TABELA -->
         <div class="card">
           <div class="head controls">
             <div class="title">Results</div>
@@ -199,7 +263,7 @@
           </div>
         </div>
 
-        <!-- CHARTS STACKED -->
+        <!-- GRÁFICOS EMPILHADOS -->
         <div class="charts">
           <div class="card chart-card" id="chart-month-card">
             <div class="head"><div class="title">Records by Month</div></div>
@@ -223,7 +287,7 @@
 <!-- MODAL: Column visibility -->
 <div id="modal-cols" class="modal">
   <div class="win">
-    <div class="head"><div class="title">Visible columns</div><button class="btn ghost" id="cols-close">Close</button></div>
+    <div class="head"><div class="title">Visible columns</div><button class="btn" id="cols-close">Close</button></div>
     <div class="body">
       <p class="muted" style="margin-bottom:10px">Select which columns appear in the table and exports.</p>
       <div id="cols-list" class="col-list"></div>
@@ -239,7 +303,7 @@
 <!-- MODAL: Excel export -->
 <div id="modal-xlsx" class="modal">
   <div class="win">
-    <div class="head"><div class="title">Excel export</div><button class="btn ghost" id="xlsx-close">Close</button></div>
+    <div class="head"><div class="title">Excel export</div><button class="btn" id="xlsx-close">Close</button></div>
     <div class="body">
       <label>Report title</label>
       <input id="xlsx-title" value="Safety Report"/>
@@ -255,7 +319,7 @@
 <!-- MODAL: PDF export -->
 <div id="modal-pdf" class="modal">
   <div class="win">
-    <div class="head"><div class="title">PDF export</div><button class="btn ghost" id="pdf-close">Close</button></div>
+    <div class="head"><div class="title">PDF export</div><button class="btn" id="pdf-close">Close</button></div>
     <div class="body">
       <label>Report title</label>
       <input id="pdf-title" value="Safety Report"/>
@@ -285,41 +349,22 @@ const STORAGE_KEY = "arbor_safety_token_premium_v1";
 /* ===== STATE ===== */
 let state = {
   token:null, user:null, role:null, allowed:"*",
-  headers:[], rows:[], // table: arrays aligned to headers
-  meta:[],            // per-row meta (expects __row from backend)
-  visible:{},         // map header -> visible (true/false)
-  charts:{month:null, loc:null}
+  headers:[], rows:[], meta:[], visible:{}, charts:{month:null, loc:null}
 };
 
 /* ===== UTIL ===== */
 const $ = sel => document.querySelector(sel);
-const $$ = sel => document.querySelectorAll(sel);
-function show(id){ $("#view-login").style.display="none"; $("#view-dash").style.display="none"; $(id).style.display="block"; }
+function show(id){ document.querySelector("#view-login").style.display="none"; document.querySelector("#view-dash").style.display="none"; document.querySelector(id).style.display="block"; }
 function setStatus(el, msg){ el.textContent = msg || ""; }
-function download(name, content, mime="text/plain"){
-  const blob = new Blob([content], {type:mime}); const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
-}
-function groupBy(arr, keyFn){
-  const m = new Map(); for(const r of arr){ const k = keyFn(r); m.set(k,(m.get(k)||0)+1); }
-  return [...m.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
-}
+function groupBy(arr, keyFn){ const m=new Map(); for(const r of arr){ const k=keyFn(r); m.set(k,(m.get(k)||0)+1); } return [...m.entries()].sort((a,b)=>a[0]>b[0]?1:-1); }
 
 /* ===== AUTH ===== */
-function loadSession(){
-  try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return;
-    const obj = JSON.parse(raw); state.token=obj.token; state.user=obj.user; state.role=obj.role; state.allowed=obj.allowed;
-  }catch{}
-}
-function saveSession(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({token:state.token,user:state.user,role:state.role,allowed:state.allowed}));
-}
-function clearSession(){
-  localStorage.removeItem(STORAGE_KEY); state.token=null; state.user=null; state.role=null; state.allowed="*";
-}
+function loadSession(){ try{ const raw=localStorage.getItem(STORAGE_KEY); if(!raw) return; const obj=JSON.parse(raw); state.token=obj.token; state.user=obj.user; state.role=obj.role; state.allowed=obj.allowed; }catch{} }
+function saveSession(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({token:state.token,user:state.user,role:state.role,allowed:state.allowed})); }
+function clearSession(){ localStorage.removeItem(STORAGE_KEY); state.token=null; state.user=null; state.allowed="*"; }
 function paintUser(){
-  const who=$("#who"), out=$("#btn-logout");
-  if(state.user){ who.style.display="inline-block"; out.style.display="inline-block"; who.textContent=`${state.user} • ${state.role}`; }
+  const who=document.querySelector("#who"), out=document.querySelector("#btn-logout");
+  if(state.user){ who.style.display="inline-block"; out.style.display="inline-block"; who.textContent=`${state.user} • ${state.role||"user"}`; }
   else{ who.style.display="none"; out.style.display="none"; }
 }
 
@@ -331,60 +376,55 @@ async function apiPost(route, payload){
 
 /* ===== LOGIN ===== */
 async function doLogin(){
-  const u=$("#login-user").value.trim(); const p=$("#login-pass").value; const status=$("#login-status");
+  const u=document.querySelector("#login-user").value.trim();
+  const p=document.querySelector("#login-pass").value;
+  const status=document.querySelector("#login-status");
   if(!u||!p){ setStatus(status,"Enter username and password."); return; }
-  setStatus(status,"Signing in..."); $("#btn-login").disabled=true;
+  setStatus(status,"Signing in..."); document.querySelector("#btn-login").disabled=true;
   try{
     const res = await apiPost("login",{username:u,password:p});
     if(res && res.ok){
       state.token=res.token; state.user=u; state.role=res.role||"user"; state.allowed=res.allowed||"*";
       saveSession(); paintUser(); show("#view-dash"); initDates(); setStatus(status,"");
     }else setStatus(status, res && res.error ? `Login failed: ${res.error}` : "Login failed.");
-  }catch{ setStatus(status,"Network error."); } finally{ $("#btn-login").disabled=false; }
+  }catch{ setStatus(status,"Network error."); } finally{ document.querySelector("#btn-login").disabled=false; }
 }
 
 /* ===== REPORT ===== */
 function initDates(){
   const t=new Date(), from=new Date(t); from.setMonth(from.getMonth()-1);
-  $("#date-from").value = from.toISOString().slice(0,10);
-  $("#date-to").value   = t.toISOString().slice(0,10);
+  document.querySelector("#date-from").value = from.toISOString().slice(0,10);
+  document.querySelector("#date-to").value   = t.toISOString().slice(0,10);
 }
 async function runReport(){
-  const status=$("#run-status"); setStatus(status,"Loading..."); $("#btn-run").disabled=true;
-  const form=$("#form-type").value, from=$("#date-from").value||null, to=$("#date-to").value||null;
+  const status=document.querySelector("#run-status"); setStatus(status,"Loading..."); document.querySelector("#btn-run").disabled=true;
+  const form=document.querySelector("#form-type").value, from=document.querySelector("#date-from").value||null, to=document.querySelector("#date-to").value||null;
   try{
     const res = await apiPost("list",{token:state.token,form,from,to});
     if(!res || !res.ok){ setStatus(status, res && res.error ? res.error : "Error loading report."); return; }
-    // headers + rows
     state.headers = res.header || res.headers || [];
     const objects = res.rows || [];
-    // meta (__row)
     state.meta = objects.map(o=>({__row:o.__row, __sheet:o.__sheet}));
-    // rows as arrays
     state.rows = objects.map(o => state.headers.map(h => o[h] ?? ""));
-    // first-time visible -> all true
     if(Object.keys(state.visible).length===0) state.headers.forEach(h => state.visible[h]=true);
     drawTable(); drawCharts();
     setStatus(status,`${state.rows.length} records loaded.`);
-  }catch{ setStatus(status,"Network error."); } finally{ $("#btn-run").disabled=false; }
+  }catch{ setStatus(status,"Network error."); } finally{ document.querySelector("#btn-run").disabled=false; }
 }
 
 /* ===== TABLE RENDER + EDIT ===== */
 function drawTable(){
-  const thead=$("#tbl thead"), tbody=$("#tbl tbody"); thead.innerHTML=""; tbody.innerHTML="";
-  if(!state.headers.length){ thead.innerHTML="<tr><th>No data</th></tr>"; $("#count").textContent="0 rows"; return; }
-  // header
+  const thead=document.querySelector("#tbl thead"), tbody=document.querySelector("#tbl tbody"); thead.innerHTML=""; tbody.innerHTML="";
+  if(!state.headers.length){ thead.innerHTML="<tr><th>No data</th></tr>"; document.querySelector("#count").textContent="0 rows"; return; }
   const trh=document.createElement("tr");
   state.headers.forEach(h=>{
     if(state.visible[h]!==false){
       const th=document.createElement("th"); th.textContent=h.replace(/_/g,' ').toUpperCase(); trh.appendChild(th);
     }
   });
-  // actions col
   const thAct=document.createElement("th"); thAct.textContent="ACTIONS"; trh.appendChild(thAct);
   thead.appendChild(trh);
 
-  // body
   state.rows.forEach((row, idx)=>{
     const tr=document.createElement("tr");
     row.forEach((val, cIdx)=>{
@@ -393,7 +433,6 @@ function drawTable(){
       const v=(val==null?"":String(val));
       if(/^https?:\/\//i.test(v)){ const a=document.createElement("a"); a.href=v; a.target="_blank"; a.textContent="Open"; td.appendChild(a); }
       else{
-        // editable? (skip links & protected)
         const protectedCols = new Set(["photo_url","attachment","created_at","timestamp"]);
         const editable = !protectedCols.has(h);
         if(editable){ td.contentEditable="true"; td.dataset.col=h; td.addEventListener("input", ()=> td.classList.add("pending")); }
@@ -401,7 +440,6 @@ function drawTable(){
       }
       tr.appendChild(td);
     });
-    // actions
     const tdA=document.createElement("td"); tdA.className="row-actions";
     const btnSave=document.createElement("button"); btnSave.className="btn"; btnSave.textContent="Save";
     const btnDel=document.createElement("button"); btnDel.className="btn danger"; btnDel.textContent="Delete";
@@ -412,11 +450,11 @@ function drawTable(){
     tbody.appendChild(tr);
   });
 
-  $("#count").textContent=`${state.rows.length} rows`;
+  document.querySelector("#count").textContent=`${state.rows.length} rows`;
 }
 async function saveRow(idx, tr){
   const meta = state.meta[idx]; if(!meta || !meta.__row){ alert("Editing not available: missing row id from backend."); return; }
-  const form = $("#form-type").value;
+  const form = document.querySelector("#form-type").value;
   const patch = {};
   const cells = tr.querySelectorAll("td[contenteditable='true']");
   let changed=0;
@@ -431,51 +469,46 @@ async function saveRow(idx, tr){
 async function deleteRow(idx){
   const meta = state.meta[idx]; if(!meta || !meta.__row){ alert("Delete not available: missing row id."); return; }
   if(!confirm("Are you sure you want to delete this record?")) return;
-  const form = $("#form-type").value;
+  const form = document.querySelector("#form-type").value;
   const res = await apiPost("delete",{token:state.token, form, rowId:meta.__row});
   if(!res || !res.ok){ alert(res && res.error ? res.error : "Delete failed"); return; }
-  // refresh
   runReport();
 }
 
 /* ===== CHARTS ===== */
 function destroyChart(c){ if(c){ c.destroy(); } }
 function drawCharts(){
-  const H=state.headers, R=state.rows; // arrays
-  // detect columns
+  const H=state.headers, R=state.rows;
   const dateCols=["incident_date","date_of_report","injury_datetime","accident_datetime","date_reported","report_date"];
   let dIdx = dateCols.findIndex(n => H.includes(n)); dIdx = dIdx>-1 ? H.indexOf(dateCols[dIdx]) : -1;
 
   const locCols=["location","work_area","city_state_zip","building","exact_location"];
   let lIdx = locCols.findIndex(n => H.includes(n)); lIdx = lIdx>-1 ? H.indexOf(locCols[lIdx]) : -1;
 
-  // month data
   const monthCounts = dIdx>-1 ? groupBy(R, r=>{
     const raw=String(r[dIdx]||""); const iso=raw.length>=10?raw.slice(0,10):raw; const d=new Date(iso);
     return isNaN(d) ? "Unknown" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
   }) : [];
-  // location data
   const locCounts = lIdx>-1 ? groupBy(R, r=>{
     const v=String(r[lIdx]||"").trim(); return v||"Unspecified";
   }) : [];
   const topL = locCounts.sort((a,b)=>b[1]-a[1]).slice(0,10);
 
-  // render
   destroyChart(state.charts.month);
   destroyChart(state.charts.loc);
-  // month
-  $("#chart-month-card").style.display = monthCounts.length ? "block":"none";
+
+  document.querySelector("#chart-month-card").style.display = monthCounts.length ? "block":"none";
   if(monthCounts.length){
-    state.charts.month = new Chart($("#chart-month"), {
+    state.charts.month = new Chart(document.querySelector("#chart-month"), {
       type:"bar",
       data:{ labels:monthCounts.map(x=>x[0]), datasets:[{label:"Records", data:monthCounts.map(x=>x[1])}] },
       options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
     });
   }
-  // locations
-  $("#chart-loc-card").style.display = topL.length ? "block":"none";
+
+  document.querySelector("#chart-loc-card").style.display = topL.length ? "block":"none";
   if(topL.length){
-    state.charts.loc = new Chart($("#chart-loc"), {
+    state.charts.loc = new Chart(document.querySelector("#chart-loc"), {
       type:"bar",
       data:{ labels:topL.map(x=>x[0]), datasets:[{label:"Records", data:topL.map(x=>x[1])}] },
       options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} }
@@ -483,9 +516,9 @@ function drawCharts(){
   }
 }
 
-/* ===== COLUMN VISIBILITY ===== */
+/* ===== COL VISIBILITY ===== */
 function openColsModal(){
-  const m=$("#modal-cols"), list=$("#cols-list"); list.innerHTML="";
+  const m=document.querySelector("#modal-cols"), list=document.querySelector("#cols-list"); list.innerHTML="";
   if(!state.headers.length){ list.innerHTML="<div class='muted'>Run a report first.</div>"; m.style.display="flex"; return; }
   state.headers.forEach(h=>{
     const wrap=document.createElement("label"); wrap.className="btn"; wrap.style.justifyContent="space-between";
@@ -496,18 +529,19 @@ function openColsModal(){
   });
   m.style.display="flex";
 }
-function colsApply(){ $("#modal-cols").style.display="none"; drawTable(); }
+function colsApply(){ document.querySelector("#modal-cols").style.display="none"; drawTable(); }
 function colsAll(){ state.headers.forEach(h=> state.visible[h]=true); openColsModal(); }
 function colsNone(){ state.headers.forEach(h=> state.visible[h]=false); openColsModal(); }
 
-/* ===== EXCEL EXPORT ===== */
+/* ===== EXCEL ===== */
 function openExcelModal(){
   if(!state.rows.length){ alert("No data."); return; }
-  $("#xlsx-title").value = `${$("#form-type").options[$("#form-type").selectedIndex].text} Report - ${new Date().toISOString().slice(0,10)}`;
-  $("#modal-xlsx").style.display="flex";
+  const sel = document.querySelector("#form-type");
+  document.querySelector("#xlsx-title").value = `${sel.options[sel.selectedIndex].text} Report - ${new Date().toISOString().slice(0,10)}`;
+  document.querySelector("#modal-xlsx").style.display="flex";
 }
 function exportExcel(){
-  const title = $("#xlsx-title").value || "Safety Report";
+  const title = document.querySelector("#xlsx-title").value || "Safety Report";
   const hdr = state.headers.filter(h => state.visible[h]!==false);
   if(!hdr.length){ alert("Select at least one column."); return; }
   const matrix = state.rows.map(r => {
@@ -517,65 +551,62 @@ function exportExcel(){
   const ws = XLSX.utils.aoa_to_sheet([hdr, ...matrix]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Report");
   XLSX.writeFile(wb, `${title.replace(/\s+/g,'_')}.xlsx`);
-  $("#modal-xlsx").style.display="none";
+  document.querySelector("#modal-xlsx").style.display="none";
 }
 
-/* ===== PDF EXPORT (Print) ===== */
+/* ===== PDF ===== */
 function openPdfModal(){
   if(!state.rows.length){ alert("No data."); return; }
-  $("#pdf-title").value = `${$("#form-type").options[$("#form-type").selectedIndex].text} Report`;
-  $("#pdf-notes").value = "";
-  $("#pdf-month").checked = true; $("#pdf-loc").checked = true;
-  $("#modal-pdf").style.display="flex";
+  const sel = document.querySelector("#form-type");
+  document.querySelector("#pdf-title").value = `${sel.options[sel.selectedIndex].text} Report`;
+  document.querySelector("#pdf-notes").value = "";
+  document.querySelector("#pdf-month").checked = true; document.querySelector("#pdf-loc").checked = true;
+  document.querySelector("#modal-pdf").style.display="flex";
 }
 function exportPdf(){
-  const mOn = $("#pdf-month").checked, lOn = $("#pdf-loc").checked;
-  // add temp title/notes at top via print header block
-  const title = $("#pdf-title").value.trim();
-  const notes = $("#pdf-notes").value.trim();
+  const mOn = document.querySelector("#pdf-month").checked, lOn = document.querySelector("#pdf-loc").checked;
+  const title = document.querySelector("#pdf-title").value.trim();
+  const notes = document.querySelector("#pdf-notes").value.trim();
   const header = document.createElement("div");
   header.className="card chart-card"; header.id="pdf-topnote";
   header.innerHTML = `<div class="head"><div class="title">${title||"Safety Report"}</div></div>
     <div class="body">${notes ? `<div style="white-space:pre-wrap;color:var(--muted)">${notes}</div>` : `<div class="muted">Generated ${new Date().toLocaleString()}</div>`}</div>`;
   const content = document.querySelector(".panel .grid"); content.prepend(header);
 
-  // toggle chart visibility for print using class
-  $("#chart-month-card").classList.toggle("chart-skip", !mOn);
-  $("#chart-loc-card").classList.toggle("chart-skip", !lOn);
+  document.querySelector("#chart-month-card").classList.toggle("chart-skip", !mOn);
+  document.querySelector("#chart-loc-card").classList.toggle("chart-skip", !lOn);
 
-  $("#modal-pdf").style.display="none";
+  document.querySelector("#modal-pdf").style.display="none";
   window.print();
 
-  // cleanup
-  $("#chart-month-card").classList.remove("chart-skip");
-  $("#chart-loc-card").classList.remove("chart-skip");
+  document.querySelector("#chart-month-card").classList.remove("chart-skip");
+  document.querySelector("#chart-loc-card").classList.remove("chart-skip");
   header.remove();
 }
 
 /* ===== BOOT ===== */
 function boot(){
-  // wire buttons
-  $("#btn-login").addEventListener("click", doLogin);
-  $("#login-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+  document.querySelector("#btn-login").addEventListener("click", doLogin);
+  document.querySelector("#login-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
 
-  $("#btn-run").addEventListener("click", runReport);
-  $("#btn-logout").addEventListener("click", ()=>{ clearSession(); paintUser(); show("#view-login"); });
+  document.querySelector("#btn-run").addEventListener("click", runReport);
+  document.querySelector("#btn-logout").addEventListener("click", ()=>{ clearSession(); paintUser(); show("#view-login"); });
 
-  $("#btn-col-manage").addEventListener("click", openColsModal);
-  $("#cols-close").addEventListener("click", ()=> $("#modal-cols").style.display="none");
-  $("#cols-apply").addEventListener("click", colsApply);
-  $("#cols-all").addEventListener("click", colsAll);
-  $("#cols-none").addEventListener("click", colsNone);
+  document.querySelector("#btn-col-manage").addEventListener("click", openColsModal);
+  document.querySelector("#cols-close").addEventListener("click", ()=> document.querySelector("#modal-cols").style.display="none");
+  document.querySelector("#cols-apply").addEventListener("click", colsApply);
+  document.querySelector("#cols-all").addEventListener("click", colsAll);
+  document.querySelector("#cols-none").addEventListener("click", colsNone);
 
-  $("#btn-excel").addEventListener("click", openExcelModal);
-  $("#xlsx-close").addEventListener("click", ()=> $("#modal-xlsx").style.display="none");
-  $("#xlsx-cancel").addEventListener("click", ()=> $("#modal-xlsx").style.display="none");
-  $("#xlsx-go").addEventListener("click", exportExcel);
+  document.querySelector("#btn-excel").addEventListener("click", openExcelModal);
+  document.querySelector("#xlsx-close").addEventListener("click", ()=> document.querySelector("#modal-xlsx").style.display="none");
+  document.querySelector("#xlsx-cancel").addEventListener("click", ()=> document.querySelector("#modal-xlsx").style.display="none");
+  document.querySelector("#xlsx-go").addEventListener("click", exportExcel);
 
-  $("#btn-pdf").addEventListener("click", openPdfModal);
-  $("#pdf-close").addEventListener("click", ()=> $("#modal-pdf").style.display="none");
-  $("#pdf-cancel").addEventListener("click", ()=> $("#modal-pdf").style.display="none");
-  $("#pdf-go").addEventListener("click", exportPdf);
+  document.querySelector("#btn-pdf").addEventListener("click", openPdfModal);
+  document.querySelector("#pdf-close").addEventListener("click", ()=> document.querySelector("#modal-pdf").style.display="none");
+  document.querySelector("#pdf-cancel").addEventListener("click", ()=> document.querySelector("#modal-pdf").style.display="none");
+  document.querySelector("#pdf-go").addEventListener("click", exportPdf);
 
   loadSession(); paintUser();
   if(state.token){ show("#view-dash"); initDates(); }
@@ -585,4 +616,3 @@ boot();
 </script>
 </body>
 </html>
-
