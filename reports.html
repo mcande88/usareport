@@ -343,7 +343,7 @@
 
 <script>
 /* ===== CONFIG ===== */
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwi-0E7HWZm4KDUMWHv4jnNXahTKXOkO9OsCTjH69helju9RJeS7o_KJbv9GbIAhdPy/exec";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbxWy82Tk5HkS1LO-CoXNiAAqBgCVW3zbLXJeo390ERLYMgP530y7CsPhp3xzwXztmeQ/exec";
 const STORAGE_KEY = "arbor_safety_token_premium_v1";
 
 /* ===== STATE ===== */
@@ -404,7 +404,12 @@ async function runReport(){
     if(!res || !res.ok){ setStatus(status, res && res.error ? res.error : "Error loading report."); return; }
     state.headers = res.header || res.headers || [];
     const objects = res.rows || [];
-    state.meta = objects.map(o=>({__row:o.__row, __sheet:o.__sheet}));
+    state.meta = objects.map(o=>{
+  // aceita várias convenções que o backend possa ter usado
+  const rowId = o.__row ?? o._row ?? o.rowId ?? o.rowID ?? o.row_id ?? o.id ?? o.ROW ?? o.row;
+  const sheet = o.__sheet ?? o._sheet ?? o.sheet ?? o.SHEET ?? o.sheetName;
+  return { __row: rowId, __sheet: sheet };
+});
     state.rows = objects.map(o => state.headers.map(h => o[h] ?? ""));
     if(Object.keys(state.visible).length===0) state.headers.forEach(h => state.visible[h]=true);
     drawTable(); drawCharts();
@@ -616,3 +621,4 @@ boot();
 </script>
 </body>
 </html>
+
