@@ -1,544 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Safety Analytics • ArborGen</title>
-  <link rel="icon" type="image/png" href="icon.png" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ArborGen • Safety Reports (Premium)</title>
+  <link rel="icon" type="image/png" href="icon.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #1a472a;
-      --primary-dark: #0f2e1a;
-      --primary-light: #2d6a4f;
-      --secondary: #40916c;
-      --accent: #52b788;
-      --accent-light: #95d5b2;
-      --bg: #f8fdf9;
-      --card: #ffffff;
-      --muted: #6c757d;
-      --border: #e0e0e0;
-      --success: #28a745;
-      --warning: #ffc107;
-      --danger: #dc3545;
-      --text: #212529;
-      --text-light: #6c757d;
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
-      --radius: 8px;
+    :root{
+      /* ArborGen greens */
+      --primary:#1a472a;      /* deep green */
+      --primary-600:#165024;  /* hover */
+      --accent:#2d6a4f;       /* lighter green for accents */
+      --bg:#f4fbf7;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --shadow:0 6px 18px rgba(0,0,0,.06);
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1400px;margin:0 auto;padding:0 20px}
+
+    header{background:linear-gradient(135deg,var(--primary),#0f2e1a);color:#fff;position:sticky;top:0;z-index:20;box-shadow:var(--shadow)}
+    header .bar{display:flex;align-items:center;justify-content:space-between;padding:14px 0}
+    header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.2px}
+    header .actions{display:flex;gap:10px;align-items:center}
+    header .pill{background:rgba(255,255,255,.15);padding:6px 10px;border-radius:999px;font-size:12px}
+    header button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer}
+    header button:hover{background:rgba(255,255,255,.12)}
+
+    main{padding:26px 0 40px}
+    .grid{display:grid;gap:18px}
+    .panel{display:grid;grid-template-columns:300px 1fr;gap:20px}
+    @media (max-width:1024px){.panel{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card .head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .card .title{font-weight:700}
+    .card .body{padding:16px}
+
+    .side{display:flex;flex-direction:column;gap:18px}
+    .group{border:1px solid var(--border);border-radius:10px;background:#fff}
+    .group h3{margin:0;padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:#0f2e1a;text-transform:uppercase;letter-spacing:.3px}
+    .group .box{padding:14px}
+    label{display:block;font-size:13px;font-weight:600;margin:6px 0 6px}
+    select,input[type="text"],input[type="date"],input[type="password"],input[type="number"],textarea{
+      width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;font-size:14px
+    }
+    select:focus, input:focus, textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .muted{color:var(--muted);font-size:13px}
+
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;font-weight:600}
+    .btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .btn.primary:hover{background:var(--primary-600)}
+    .btn.ghost{background:#fff}
+    .btn.danger{background:#b91c1c;border-color:#b91c1c;color:#fff}
+    .note{font-size:12px;color:var(--muted)}
+
+    .table-wrap{border:1px solid var(--border);border-radius:10px;overflow:auto;max-height:520px}
+    table{width:100%;border-collapse:collapse;min-width:840px}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
+    th{position:sticky;top:0;background:#f6fbf8;font-size:12px;text-transform:uppercase;z-index:1}
+    tr:hover{background:#f9fcfa}
+    td[contenteditable="true"]{outline:none;border-radius:6px}
+    td.pending{background:#fff7e6;box-shadow:inset 0 0 0 2px #fde68a}
+    .row-actions{white-space:nowrap;display:flex;gap:6px}
+
+    /* Charts stacked vertically (no sideways scroll) */
+    .charts{display:flex;flex-direction:column;gap:18px}
+    .chart-card{padding:16px 12px}
+    .chart-holder{position:relative;height:320px}
+
+    /* Modals */
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+    .modal .win{background:#fff;border-radius:12px;max-width:720px;width:100%;max-height:90vh;overflow:auto;border:1px solid var(--border);box-shadow:var(--shadow)}
+    .win .head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .win .body{padding:16px}
+    .win .foot{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+    .col-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:560px){.col-list{grid-template-columns:1fr}}
+
+    /* Print CSS (PDF) */
+    @media print{
+      header, .side, .controls, .note {display:none!important}
+      .wrap{max-width:none;padding:0}
+      main{padding:0}
+      .panel{grid-template-columns:1fr!important;gap:0}
+      .card{border:none;box-shadow:none}
+      .table-wrap{max-height:none;border:1px solid #000}
+      th,td{border:1px solid #000}
+      .chart-card{page-break-inside:avoid}
+      .chart-skip{display:none!important}
     }
-
-    * { 
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button {
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    /* Header */
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      box-shadow: var(--shadow);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-
-    .user-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .user-badge {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      border: none;
-      transition: all 0.2s ease;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-    }
-
-    .btn-outline:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Main Layout */
-    main {
-      padding: 24px 0 40px;
-    }
-
-    .dashboard {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 24px;
-    }
-
-    @media (max-width: 1024px) {
-      .dashboard {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Cards */
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .card-body {
-      padding: 20px;
-    }
-
-    /* Sidebar */
-    .filter-group {
-      margin-bottom: 20px;
-    }
-
-    .filter-group:last-child {
-      margin-bottom: 0;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    select, input {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 14px;
-      background: white;
-      color: var(--text);
-    }
-
-    select:focus, input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.1);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .btn-secondary {
-      background: var(--secondary);
-      color: white;
-      border: none;
-    }
-
-    .btn-secondary:hover {
-      background: var(--primary-light);
-    }
-
-    /* Charts */
-    .charts-container {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .chart-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .chart-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .chart-container {
-      position: relative;
-      height: 300px;
-    }
-
-    /* Data Table */
-    .data-section {
-      margin-top: 20px;
-    }
-
-    .table-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .table-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .table-wrapper {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: auto;
-      max-height: 500px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 800px;
-    }
-
-    th {
-      background: #f8f9fa;
-      padding: 12px 16px;
-      text-align: left;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    td {
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      vertical-align: top;
-    }
-
-    tr:hover {
-      background: #f8f9fa;
-    }
-
-    .column-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .column-toggle input {
-      width: auto;
-    }
-
-    /* Login */
-    .login-container {
-      max-width: 400px;
-      margin: 80px auto;
-      padding: 40px;
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .login-logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .login-title {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    .login-subtitle {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .status-message {
-      padding: 12px;
-      border-radius: 6px;
-      margin-top: 16px;
-      font-size: 14px;
-    }
-
-    .status-error {
-      background: rgba(220, 53, 69, 0.1);
-      color: var(--danger);
-    }
-
-    .status-success {
-      background: rgba(40, 167, 69, 0.1);
-      color: var(--success);
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
-    }
-
-    .modal {
-      background: white;
-      border-radius: var(--radius);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow: auto;
-    }
-
-    .modal-header {
-      padding: 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-title {
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .modal-body {
-      padding: 20px;
-    }
-
-    .modal-footer {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-
-    /* Utility Classes */
-    .hidden {
-      display: none !important;
-    }
-
-    .text-center {
-      text-align: center;
-    }
-
-    .text-muted {
-      color: var(--muted);
-    }
-
-    .mt-1 { margin-top: 8px; }
-    .mt-2 { margin-top: 16px; }
-    .mt-3 { margin-top: 24px; }
-    .mb-1 { margin-bottom: 8px; }
-    .mb-2 { margin-bottom: 16px; }
-    .mb-3 { margin-bottom: 24px; }
-
-    .flex {
-      display: flex;
-    }
-
-    .flex-between {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .flex-center {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gap-1 { gap: 8px; }
-    .gap-2 { gap: 16px; }
   </style>
-  <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SheetJS para exportação Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-
 <header>
-  <div class="container header-content">
-    <div class="logo">
-      <div class="logo-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L3 7V22H21V7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M12 22V12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M7 12H17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="logo-text">ArborGen Safety</div>
-    </div>
-    <div class="user-actions">
-      <div id="user-badge" class="user-badge hidden">
-        <span id="user-name"></span>
-        <span id="user-role"></span>
-      </div>
-      <button id="btn-logout" class="btn btn-outline hidden">Sign Out</button>
+  <div class="wrap bar">
+    <h1>ArborGen • Safety Reports</h1>
+    <div class="actions">
+      <span id="who" class="pill" style="display:none"></span>
+      <button id="btn-logout" style="display:none">Sign out</button>
     </div>
   </div>
 </header>
 
-<main class="container">
-  <!-- Login View -->
-  <div id="view-login" class="card login-container">
-    <div class="login-header">
-      <div class="login-logo">
-        <div class="logo-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L3 7V22H21V7L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M12 22V12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 12H17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-      </div>
-      <h1 class="login-title">Safety Analytics</h1>
-      <p class="login-subtitle">Access incident reports and analytics dashboard</p>
+<main class="wrap" id="app">
+  <!-- LOGIN -->
+  <div id="view-login" class="card" style="max-width:420px;margin:60px auto">
+    <div class="head"><div class="title">Sign in</div></div>
+    <div class="body">
+      <label>Username</label>
+      <input id="login-user" autocomplete="username"/>
+      <label style="margin-top:8px">Password</label>
+      <input id="login-pass" type="password" autocomplete="current-password"/>
+      <button id="btn-login" class="btn primary" style="width:100%;margin-top:12px">Sign in</button>
+      <p id="login-status" class="muted" style="margin-top:8px"></p>
     </div>
-    <div class="form-group">
-      <label for="login-user">Username</label>
-      <input type="text" id="login-user" autocomplete="username" placeholder="Enter your username">
-    </div>
-    <div class="form-group">
-      <label for="login-pass">Password</label>
-      <input type="password" id="login-pass" autocomplete="current-password" placeholder="Enter your password">
-    </div>
-    <button id="btn-login" class="btn btn-primary" style="width: 100%;">Sign In</button>
-    <div id="login-status" class="status-message hidden"></div>
-    <p class="text-muted text-center mt-3">
-      Use your ArborGen credentials. All access is logged for security auditing.
-    </p>
   </div>
 
-  <!-- Dashboard View -->
-  <div id="view-dash" class="hidden">
-    <div class="dashboard">
-      <!-- Sidebar Filters -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Report Filters</div>
-        </div>
-        <div class="card-body">
-          <div class="filter-group">
-            <label for="form-type">Report Type</label>
+  <!-- DASHBOARD -->
+  <div id="view-dash" style="display:none">
+    <div class="panel">
+      <!-- SIDEBAR -->
+      <div class="side">
+        <div class="group">
+          <h3>Report scope</h3>
+          <div class="box">
+            <label>Form</label>
             <select id="form-type">
               <option value="employee_first">Employee Incident</option>
               <option value="supervisor_investigation">Supervisor Investigation</option>
@@ -546,823 +144,444 @@
               <option value="non_company_injury">Non-Company Injury</option>
               <option value="near_miss">Near-Miss Report</option>
             </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="date-range">Date Range</label>
-            <div class="flex gap-1">
-              <input type="date" id="date-from" style="flex: 1;">
-              <input type="date" id="date-to" style="flex: 1;">
+            <div class="row" style="margin-top:10px">
+              <div>
+                <label>From</label>
+                <input type="date" id="date-from">
+              </div>
+              <div>
+                <label>To</label>
+                <input type="date" id="date-to">
+              </div>
             </div>
+            <button id="btn-run" class="btn primary" style="margin-top:12px">Run report</button>
+            <p id="run-status" class="muted" style="margin-top:6px"></p>
           </div>
+        </div>
 
-          <div class="filter-group">
-            <label for="location-filter">Location</label>
-            <select id="location-filter">
-              <option value="">All Locations</option>
-              <!-- Will be populated dynamically -->
-            </select>
+        <div class="group">
+          <h3>Columns</h3>
+          <div class="box">
+            <div class="toolbar">
+              <button id="btn-col-manage" class="btn">Manage visible columns</button>
+            </div>
+            <p class="note" style="margin-top:8px">Exports will include only the selected columns.</p>
           </div>
+        </div>
 
-          <button id="btn-run" class="btn btn-primary" style="width: 100%;">Generate Report</button>
-          <div id="run-status" class="status-message mt-2 hidden"></div>
+        <div class="group">
+          <h3>Export</h3>
+          <div class="box">
+            <div class="toolbar">
+              <button id="btn-excel" class="btn">Excel (.xlsx)</button>
+              <button id="btn-pdf" class="btn">PDF (print)</button>
+            </div>
+            <p class="note" style="margin-top:8px">Choose title and contents before exporting.</p>
+          </div>
         </div>
       </div>
 
-      <!-- Main Content -->
-      <div>
-        <!-- Export Controls -->
-        <div class="card mb-2">
-          <div class="card-body">
-            <div class="flex-between">
-              <div class="card-title">Export Options</div>
-              <div class="flex gap-1">
-                <button id="btn-columns" class="btn btn-outline">Manage Columns</button>
-                <button id="btn-excel" class="btn btn-secondary">Export to Excel</button>
-                <button id="btn-pdf" class="btn btn-primary">Generate PDF Report</button>
-              </div>
-            </div>
+      <!-- CONTENT -->
+      <div class="grid">
+        <!-- TABLE -->
+        <div class="card">
+          <div class="head controls">
+            <div class="title">Results</div>
+            <div class="muted" id="count">0 rows</div>
           </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-container">
-          <div class="chart-row">
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">Incidents by Month</div>
-              </div>
-              <div class="card-body">
-                <div class="chart-container">
-                  <canvas id="chart-month"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title">Incidents by Location</div>
-              </div>
-              <div class="card-body">
-                <div class="chart-container">
-                  <canvas id="chart-loc"></canvas>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="card data-section">
-          <div class="card-header">
-            <div class="card-title">Report Data</div>
-            <div class="flex gap-1">
-              <span id="row-count" class="text-muted">0 records</span>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="table-wrapper">
-              <table id="data-table">
-                <thead id="table-head">
-                  <!-- Will be populated dynamically -->
-                </thead>
-                <tbody id="table-body">
-                  <!-- Will be populated dynamically -->
-                </tbody>
+          <div class="body">
+            <div class="table-wrap">
+              <table id="tbl">
+                <thead></thead>
+                <tbody></tbody>
               </table>
             </div>
           </div>
         </div>
+
+        <!-- CHARTS STACKED -->
+        <div class="charts">
+          <div class="card chart-card" id="chart-month-card">
+            <div class="head"><div class="title">Records by Month</div></div>
+            <div class="body">
+              <div class="chart-holder"><canvas id="chart-month"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card chart-card" id="chart-loc-card">
+            <div class="head"><div class="title">Top Locations</div></div>
+            <div class="body">
+              <div class="chart-holder"><canvas id="chart-loc"></canvas></div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </div><!-- /panel -->
+  </div><!-- /dash -->
 </main>
 
-<!-- Column Selection Modal -->
-<div id="modal-columns" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Manage Columns</div>
-      <button class="modal-close">&times;</button>
+<!-- MODAL: Column visibility -->
+<div id="modal-cols" class="modal">
+  <div class="win">
+    <div class="head"><div class="title">Visible columns</div><button class="btn ghost" id="cols-close">Close</button></div>
+    <div class="body">
+      <p class="muted" style="margin-bottom:10px">Select which columns appear in the table and exports.</p>
+      <div id="cols-list" class="col-list"></div>
     </div>
-    <div class="modal-body">
-      <p class="text-muted mb-2">Select which columns to display in the table:</p>
-      <div id="column-list">
-        <!-- Will be populated dynamically -->
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button id="btn-select-all" class="btn btn-outline">Select All</button>
-      <button id="btn-deselect-all" class="btn btn-outline">Deselect All</button>
-      <button id="btn-apply-columns" class="btn btn-primary">Apply</button>
+    <div class="foot">
+      <button id="cols-all" class="btn">Select all</button>
+      <button id="cols-none" class="btn">Deselect all</button>
+      <button id="cols-apply" class="btn primary">Apply</button>
     </div>
   </div>
 </div>
 
-<!-- Excel Options Modal -->
-<div id="modal-excel" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Excel Export Options</div>
-      <button class="modal-close">&times;</button>
+<!-- MODAL: Excel export -->
+<div id="modal-xlsx" class="modal">
+  <div class="win">
+    <div class="head"><div class="title">Excel export</div><button class="btn ghost" id="xlsx-close">Close</button></div>
+    <div class="body">
+      <label>Report title</label>
+      <input id="xlsx-title" value="Safety Report"/>
+      <p class="muted" style="margin:8px 0 12px">Only currently visible columns will be exported.</p>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="excel-title">Report Title</label>
-        <input type="text" id="excel-title" value="Safety Report" placeholder="Enter report title">
-      </div>
-      <p class="text-muted mb-2">Select which columns to include in the export:</p>
-      <div id="excel-column-list">
-        <!-- Will be populated dynamically -->
-      </div>
-      <p class="text-muted mt-2">Note: Only selected columns will be included in the export.</p>
-    </div>
-    <div class="modal-footer">
-      <button id="btn-cancel-excel" class="btn btn-outline">Cancel</button>
-      <button id="btn-export-excel" class="btn btn-primary">Export to Excel</button>
+    <div class="foot">
+      <button id="xlsx-cancel" class="btn">Cancel</button>
+      <button id="xlsx-go" class="btn primary">Export .xlsx</button>
     </div>
   </div>
 </div>
 
-<!-- PDF Options Modal -->
-<div id="modal-pdf" class="modal-overlay hidden">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">PDF Report Options</div>
-      <button class="modal-close">&times;</button>
+<!-- MODAL: PDF export -->
+<div id="modal-pdf" class="modal">
+  <div class="win">
+    <div class="head"><div class="title">PDF export</div><button class="btn ghost" id="pdf-close">Close</button></div>
+    <div class="body">
+      <label>Report title</label>
+      <input id="pdf-title" value="Safety Report"/>
+      <label style="margin-top:10px">Notes (optional)</label>
+      <textarea id="pdf-notes" rows="3" placeholder="Add any remarks you want on the first page"></textarea>
+      <div style="margin-top:14px">
+        <label style="margin-bottom:6px">Charts to include</label>
+        <div class="toolbar">
+          <label class="btn"><input id="pdf-month" type="checkbox" checked style="margin-right:8px">Records by Month</label>
+          <label class="btn"><input id="pdf-loc" type="checkbox" checked style="margin-right:8px">Top Locations</label>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:10px">Exports will include the table with current column visibility.</p>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="pdf-title">Report Title</label>
-        <input type="text" id="pdf-title" value="Safety Report" placeholder="Enter report title">
-      </div>
-      <p class="text-muted mb-2">Select which charts to include in the PDF report:</p>
-      <div class="column-toggle">
-        <input type="checkbox" id="pdf-chart-month" checked>
-        <label for="pdf-chart-month">Incidents by Month</label>
-      </div>
-      <div class="column-toggle">
-        <input type="checkbox" id="pdf-chart-loc" checked>
-        <label for="pdf-chart-loc">Incidents by Location</label>
-      </div>
-      
-      <div class="mt-3">
-        <label for="pdf-notes">Additional Notes</label>
-        <textarea id="pdf-notes" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;" placeholder="Add any additional notes or comments"></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button id="btn-cancel-pdf" class="btn btn-outline">Cancel</button>
-      <button id="btn-generate-pdf" class="btn btn-primary">Generate PDF</button>
+    <div class="foot">
+      <button id="pdf-cancel" class="btn">Cancel</button>
+      <button id="pdf-go" class="btn primary">Print / Save PDF</button>
     </div>
   </div>
 </div>
 
 <script>
 /* ===== CONFIG ===== */
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbx4bjXO_KbjxcDCdHiDm9gOXT2Qywk3CSZSjP4cQkkhJ92hvG_ioXoyznF7gJ4uornH/exec"; 
-const STORAGE_KEY = "arbor_safety_token_v2";
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbx4bjXO_KbjxcDCdHiDm9gOXT2Qywk3CSZSjP4cQkkhJ92hvG_ioXoyznF7gJ4uornH/exec";
+const STORAGE_KEY = "arbor_safety_token_premium_v1";
 
 /* ===== STATE ===== */
 let state = {
-  token: null,
-  user: null,
-  role: null,
-  allowed: "*",
-  last: { headers: [], rows: [], rawData: [] },
-  charts: { month: null, loc: null },
-  visibleColumns: [],
-  filters: {
-    formType: "employee_first",
-    dateFrom: null,
-    dateTo: null,
-    location: ""
-  }
+  token:null, user:null, role:null, allowed:"*",
+  headers:[], rows:[], // table: arrays aligned to headers
+  meta:[],            // per-row meta (expects __row from backend)
+  visible:{},         // map header -> visible (true/false)
+  charts:{month:null, loc:null}
 };
 
 /* ===== UTIL ===== */
 const $ = sel => document.querySelector(sel);
-function show(id){ 
-  $("#view-login").classList.add("hidden"); 
-  $("#view-dash").classList.add("hidden"); 
-  $(id).classList.remove("hidden"); 
+const $$ = sel => document.querySelectorAll(sel);
+function show(id){ $("#view-login").style.display="none"; $("#view-dash").style.display="none"; $(id).style.display="block"; }
+function setStatus(el, msg){ el.textContent = msg || ""; }
+function download(name, content, mime="text/plain"){
+  const blob = new Blob([content], {type:mime}); const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
 }
-
-function setStatus(el, msg, type = "error") {
-  if (!msg) {
-    el.classList.add("hidden");
-    return;
-  }
-  
-  el.textContent = msg;
-  el.classList.remove("hidden", "status-error", "status-success");
-  el.classList.add(type === "error" ? "status-error" : "status-success");
-}
-
-function formatDate(date) {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
-}
-
-function groupBy(arr, keyFn) {
-  const m = new Map();
-  for (const r of arr) {
-    const k = keyFn(r);
-    m.set(k, (m.get(k) || 0) + 1);
-  }
-  return [...m.entries()].sort((a, b) => a[0] > b[0] ? 1 : -1);
-}
-
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
+function groupBy(arr, keyFn){
+  const m = new Map(); for(const r of arr){ const k = keyFn(r); m.set(k,(m.get(k)||0)+1); }
+  return [...m.entries()].sort((a,b)=>a[0]>b[0]?1:-1);
 }
 
 /* ===== AUTH ===== */
-function loadSession() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const obj = JSON.parse(raw);
-    state.token = obj.token;
-    state.user = obj.user;
-    state.role = obj.role;
-    state.allowed = obj.allowed;
-  } catch(e) {
-    console.error("Failed to load session:", e);
-  }
+function loadSession(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return;
+    const obj = JSON.parse(raw); state.token=obj.token; state.user=obj.user; state.role=obj.role; state.allowed=obj.allowed;
+  }catch{}
 }
-
-function saveSession() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    token: state.token, 
-    user: state.user, 
-    role: state.role, 
-    allowed: state.allowed
-  }));
+function saveSession(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({token:state.token,user:state.user,role:state.role,allowed:state.allowed}));
 }
-
-function clearSession() {
-  localStorage.removeItem(STORAGE_KEY);
-  state.token = null;
-  state.user = null;
-  state.role = null;
-  state.allowed = "*";
+function clearSession(){
+  localStorage.removeItem(STORAGE_KEY); state.token=null; state.user=null; state.role=null; state.allowed="*";
 }
-
-/* ===== RENDER ===== */
-function paintUser() {
-  const badge = $("#user-badge");
-  const logoutBtn = $("#btn-logout");
-  
-  if (state.user) {
-    badge.classList.remove("hidden");
-    logoutBtn.classList.remove("hidden");
-    $("#user-name").textContent = state.user;
-    $("#user-role").textContent = `• ${state.role}`;
-  } else {
-    badge.classList.add("hidden");
-    logoutBtn.classList.add("hidden");
-  }
+function paintUser(){
+  const who=$("#who"), out=$("#btn-logout");
+  if(state.user){ who.style.display="inline-block"; out.style.display="inline-block"; who.textContent=`${state.user} • ${state.role}`; }
+  else{ who.style.display="none"; out.style.display="none"; }
 }
 
 /* ===== API ===== */
-async function apiPost(route, payload) {
-  const r = await fetch(`${ENDPOINT}?route=${encodeURIComponent(route)}`, {
-    method: "POST",
-    body: JSON.stringify(payload || {})
-  });
-
-  const txt = await r.text();
-  try { 
-    return JSON.parse(txt); 
-  } catch { 
-    return { ok: false, error: "Bad JSON", raw: txt }; 
-  }
+async function apiPost(route, payload){
+  const r = await fetch(`${ENDPOINT}?route=${encodeURIComponent(route)}`, { method:"POST", body:JSON.stringify(payload||{}) });
+  const txt = await r.text(); try{ return JSON.parse(txt); }catch{ return {ok:false,error:"Bad JSON",raw:txt}; }
 }
 
-/* ===== LOGIN FLOW ===== */
-async function doLogin() {
-  const u = $("#login-user").value.trim();
-  const p = $("#login-pass").value;
-  const status = $("#login-status");
-  
-  if (!u || !p) { 
-    setStatus(status, "Please enter both username and password."); 
-    return; 
-  }
-  
-  setStatus(status, "Signing in...", "success");
-  $("#btn-login").disabled = true;
-
-  try {
-    const res = await apiPost('login', { username: u, password: p });
-    if (res && res.ok) {
-      state.token = res.token; 
-      state.user = u; 
-      state.role = res.role || "user"; 
-      state.allowed = res.allowed || "*";
-      
-      saveSession(); 
-      paintUser();
-      show("#view-dash");
-      initDates();
-      setStatus(status, "");
-    } else {
-      setStatus(status, res && res.error ? `Login failed: ${res.error}` : "Login failed.");
-    }
-  } catch(e) {
-    setStatus(status, "Network error. Please try again.");
-  } finally {
-    $("#btn-login").disabled = false;
-  }
+/* ===== LOGIN ===== */
+async function doLogin(){
+  const u=$("#login-user").value.trim(); const p=$("#login-pass").value; const status=$("#login-status");
+  if(!u||!p){ setStatus(status,"Enter username and password."); return; }
+  setStatus(status,"Signing in..."); $("#btn-login").disabled=true;
+  try{
+    const res = await apiPost("login",{username:u,password:p});
+    if(res && res.ok){
+      state.token=res.token; state.user=u; state.role=res.role||"user"; state.allowed=res.allowed||"*";
+      saveSession(); paintUser(); show("#view-dash"); initDates(); setStatus(status,"");
+    }else setStatus(status, res && res.error ? `Login failed: ${res.error}` : "Login failed.");
+  }catch{ setStatus(status,"Network error."); } finally{ $("#btn-login").disabled=false; }
 }
 
-/* ===== REPORT FLOW ===== */
-function initDates() {
-  const today = new Date();
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  
-  $("#date-from").value = formatDate(oneMonthAgo);
-  $("#date-to").value = formatDate(today);
+/* ===== REPORT ===== */
+function initDates(){
+  const t=new Date(), from=new Date(t); from.setMonth(from.getMonth()-1);
+  $("#date-from").value = from.toISOString().slice(0,10);
+  $("#date-to").value   = t.toISOString().slice(0,10);
+}
+async function runReport(){
+  const status=$("#run-status"); setStatus(status,"Loading..."); $("#btn-run").disabled=true;
+  const form=$("#form-type").value, from=$("#date-from").value||null, to=$("#date-to").value||null;
+  try{
+    const res = await apiPost("list",{token:state.token,form,from,to});
+    if(!res || !res.ok){ setStatus(status, res && res.error ? res.error : "Error loading report."); return; }
+    // headers + rows
+    state.headers = res.header || res.headers || [];
+    const objects = res.rows || [];
+    // meta (__row)
+    state.meta = objects.map(o=>({__row:o.__row, __sheet:o.__sheet}));
+    // rows as arrays
+    state.rows = objects.map(o => state.headers.map(h => o[h] ?? ""));
+    // first-time visible -> all true
+    if(Object.keys(state.visible).length===0) state.headers.forEach(h => state.visible[h]=true);
+    drawTable(); drawCharts();
+    setStatus(status,`${state.rows.length} records loaded.`);
+  }catch{ setStatus(status,"Network error."); } finally{ $("#btn-run").disabled=false; }
 }
 
-async function runReport() {
-  const status = $("#run-status");
-  setStatus(status, "Loading report data...", "success");
-  $("#btn-run").disabled = true;
-
-  const form_type = $("#form-type").value;
-  const date_from = $("#date-from").value || null;
-  const date_to = $("#date-to").value || null;
-  const location = $("#location-filter").value;
-
-  try {
-    const res = await apiPost('list', { 
-      token: state.token, 
-      form: form_type,
-      from: date_from, 
-      to: date_to
-    });
-
-    if (!res || !res.ok) {
-      setStatus(status, (res && res.error) ? res.error : "Error loading report.");
-      return;
-    }
-
-    // Store raw data for filtering
-    state.last.headers = res.header || res.headers || [];
-    state.last.rawData = res.rows || [];
-    
-    // Apply filters
-    let filteredData = state.last.rawData;
-    
-    if (location) {
-      filteredData = filteredData.filter(row => 
-        row.location && row.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-    
-    // Convert to array format for table
-    state.last.rows = filteredData.map(obj => 
-      state.last.headers.map(h => obj[h] ?? '')
-    );
-
-    // Initialize visible columns if not set
-    if (state.visibleColumns.length === 0) {
-      state.visibleColumns = [...state.last.headers];
-    }
-    
-    // Update location filter options
-    updateLocationFilter();
-    
-    drawTable();
-    drawCharts();
-    setStatus(status, `Report loaded with ${filteredData.length} records`, "success");
-  } catch(e) {
-    setStatus(status, "Network error while loading report.");
-  } finally {
-    $("#btn-run").disabled = false;
-  }
-}
-
-function updateLocationFilter() {
-  const locationFilter = $("#location-filter");
-  const locations = [...new Set(state.last.rawData
-    .map(row => row.location)
-    .filter(Boolean)
-    .sort())];
-  
-  // Clear existing options (keeping "All Locations")
-  while (locationFilter.children.length > 1) {
-    locationFilter.removeChild(locationFilter.lastChild);
-  }
-  
-  // Add location options
-  locations.forEach(location => {
-    const option = document.createElement("option");
-    option.value = location;
-    option.textContent = location;
-    locationFilter.appendChild(option);
-  });
-}
-
-function drawTable() {
-  const thead = $("#table-head");
-  const tbody = $("#table-body");
-  const H = state.last.headers;
-  const R = state.last.rows;
-  
-  $("#row-count").textContent = `${R.length} records`;
-  
-  // Clear table
-  thead.innerHTML = "";
-  tbody.innerHTML = "";
-  
-  if (!H.length || !R.length) {
-    thead.innerHTML = "<tr><th>No data available</th></tr>";
-    return;
-  }
-  
-  // Create header with only visible columns
-  const trh = document.createElement("tr");
-  H.forEach((h, idx) => {
-    if (state.visibleColumns.includes(h)) {
-      const th = document.createElement("th");
-      th.textContent = h;
-      th.dataset.column = h;
-      trh.appendChild(th);
+/* ===== TABLE RENDER + EDIT ===== */
+function drawTable(){
+  const thead=$("#tbl thead"), tbody=$("#tbl tbody"); thead.innerHTML=""; tbody.innerHTML="";
+  if(!state.headers.length){ thead.innerHTML="<tr><th>No data</th></tr>"; $("#count").textContent="0 rows"; return; }
+  // header
+  const trh=document.createElement("tr");
+  state.headers.forEach(h=>{
+    if(state.visible[h]!==false){
+      const th=document.createElement("th"); th.textContent=h.replace(/_/g,' ').toUpperCase(); trh.appendChild(th);
     }
   });
+  // actions col
+  const thAct=document.createElement("th"); thAct.textContent="ACTIONS"; trh.appendChild(thAct);
   thead.appendChild(trh);
-  
-  // Create table rows with only visible columns
-  R.forEach(row => {
-    const tr = document.createElement("tr");
-    H.forEach((h, idx) => {
-      if (state.visibleColumns.includes(h)) {
-        const td = document.createElement("td");
-        const val = row[idx] == null ? "" : String(row[idx]);
-        
-        // Detect URLs and create links
-        if (/^https?:\/\//i.test(val)) {
-          const a = document.createElement("a");
-          a.href = val;
-          a.target = "_blank";
-          a.textContent = "View";
-          a.style.color = "var(--primary)";
-          td.appendChild(a);
-        } else {
-          td.textContent = val;
-        }
-        
-        tr.appendChild(td);
+
+  // body
+  state.rows.forEach((row, idx)=>{
+    const tr=document.createElement("tr");
+    row.forEach((val, cIdx)=>{
+      const h = state.headers[cIdx]; if(state.visible[h]===false) return;
+      const td=document.createElement("td");
+      const v=(val==null?"":String(val));
+      if(/^https?:\/\//i.test(v)){ const a=document.createElement("a"); a.href=v; a.target="_blank"; a.textContent="Open"; td.appendChild(a); }
+      else{
+        // editable? (skip links & protected)
+        const protectedCols = new Set(["photo_url","attachment","created_at","timestamp"]);
+        const editable = !protectedCols.has(h);
+        if(editable){ td.contentEditable="true"; td.dataset.col=h; td.addEventListener("input", ()=> td.classList.add("pending")); }
+        td.textContent=v;
       }
+      tr.appendChild(td);
     });
+    // actions
+    const tdA=document.createElement("td"); tdA.className="row-actions";
+    const btnSave=document.createElement("button"); btnSave.className="btn"; btnSave.textContent="Save";
+    const btnDel=document.createElement("button"); btnDel.className="btn danger"; btnDel.textContent="Delete";
+    btnSave.addEventListener("click",()=>saveRow(idx, tr));
+    btnDel.addEventListener("click",()=>deleteRow(idx));
+    tdA.appendChild(btnSave); tdA.appendChild(btnDel);
+    tr.appendChild(tdA);
     tbody.appendChild(tr);
   });
+
+  $("#count").textContent=`${state.rows.length} rows`;
+}
+async function saveRow(idx, tr){
+  const meta = state.meta[idx]; if(!meta || !meta.__row){ alert("Editing not available: missing row id from backend."); return; }
+  const form = $("#form-type").value;
+  const patch = {};
+  const cells = tr.querySelectorAll("td[contenteditable='true']");
+  let changed=0;
+  cells.forEach(td=>{
+    if(td.classList.contains("pending")){ patch[td.dataset.col]=td.textContent; changed++; }
+  });
+  if(!changed){ alert("No changes."); return; }
+  const res = await apiPost("update",{token:state.token, form, rowId:meta.__row, patch});
+  if(!res || !res.ok){ alert(res && res.error ? res.error : "Update failed"); return; }
+  cells.forEach(td=> td.classList.remove("pending"));
+}
+async function deleteRow(idx){
+  const meta = state.meta[idx]; if(!meta || !meta.__row){ alert("Delete not available: missing row id."); return; }
+  if(!confirm("Are you sure you want to delete this record?")) return;
+  const form = $("#form-type").value;
+  const res = await apiPost("delete",{token:state.token, form, rowId:meta.__row});
+  if(!res || !res.ok){ alert(res && res.error ? res.error : "Delete failed"); return; }
+  // refresh
+  runReport();
 }
 
-function destroyChart(c) { 
-  if (c) { 
-    c.destroy(); 
-  } 
-}
+/* ===== CHARTS ===== */
+function destroyChart(c){ if(c){ c.destroy(); } }
+function drawCharts(){
+  const H=state.headers, R=state.rows; // arrays
+  // detect columns
+  const dateCols=["incident_date","date_of_report","injury_datetime","accident_datetime","date_reported","report_date"];
+  let dIdx = dateCols.findIndex(n => H.includes(n)); dIdx = dIdx>-1 ? H.indexOf(dateCols[dIdx]) : -1;
 
-function drawCharts() {
-  const H = state.last.headers;
-  const rawData = state.last.rawData;
-  
-  if (!H.length || !rawData.length) {
-    destroyChart(state.charts.month);
-    destroyChart(state.charts.loc);
-    return;
-  }
-  
-  // Chart 1: Incidents by Month
-  const dateCols = ["incident_date", "date_of_report", "injury_datetime", "accident_datetime", "date_reported", "report_date"];
-  let dIdx = -1;
-  for (const cand of dateCols) {
-    if (H.includes(cand)) {
-      dIdx = H.indexOf(cand);
-      break;
-    }
-  }
-  
-  const monthCounts = dIdx > -1 ? groupBy(rawData, row => {
-    const raw = String(row[H[dIdx]] || "");
-    const iso = raw.length >= 10 ? raw.slice(0, 10) : raw;
-    const d = new Date(iso);
-    if (isNaN(d)) return "Unknown";
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  const locCols=["location","work_area","city_state_zip","building","exact_location"];
+  let lIdx = locCols.findIndex(n => H.includes(n)); lIdx = lIdx>-1 ? H.indexOf(locCols[lIdx]) : -1;
+
+  // month data
+  const monthCounts = dIdx>-1 ? groupBy(R, r=>{
+    const raw=String(r[dIdx]||""); const iso=raw.length>=10?raw.slice(0,10):raw; const d=new Date(iso);
+    return isNaN(d) ? "Unknown" : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
   }) : [];
-  
-  const ctxM = document.getElementById("chart-month").getContext("2d");
+  // location data
+  const locCounts = lIdx>-1 ? groupBy(R, r=>{
+    const v=String(r[lIdx]||"").trim(); return v||"Unspecified";
+  }) : [];
+  const topL = locCounts.sort((a,b)=>b[1]-a[1]).slice(0,10);
+
+  // render
   destroyChart(state.charts.month);
-  state.charts.month = new Chart(ctxM, {
-    type: "bar",
-    data: {
-      labels: monthCounts.map(x => x[0]),
-      datasets: [{ 
-        label: "Records", 
-        data: monthCounts.map(x => x[1]),
-        backgroundColor: "rgba(26, 71, 42, 0.7)",
-        borderColor: "rgba(26, 71, 42, 1)",
-        borderWidth: 1
-      }]
-    },
-    options: { 
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { 
-        legend: { display: false } 
-      }, 
-      scales: { 
-        y: { beginAtZero: true } 
-      } 
-    }
-  });
-  
-  // Chart 2: Incidents by Location
-  const locCols = ["location", "work_area", "city_state_zip", "building", "exact_location"];
-  let lIdx = -1;
-  for (const cand of locCols) {
-    if (H.includes(cand)) {
-      lIdx = H.indexOf(cand);
-      break;
-    }
-  }
-  
-  const locCounts = lIdx > -1 ? groupBy(rawData, row => {
-    const v = String(row[H[lIdx]] || "").trim();
-    return v || "Unspecified";
-  }) : [];
-  
-  const topL = locCounts.sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const ctxL = document.getElementById("chart-loc").getContext("2d");
   destroyChart(state.charts.loc);
-  state.charts.loc = new Chart(ctxL, {
-    type: "bar",
-    data: {
-      labels: topL.map(x => x[0]),
-      datasets: [{ 
-        label: "Records", 
-        data: topL.map(x => x[1]),
-        backgroundColor: "rgba(64, 145, 108, 0.7)",
-        borderColor: "rgba(64, 145, 108, 1)",
-        borderWidth: 1
-      }]
-    },
-    options: { 
-      responsive: true,
-      maintainAspectRatio: false,
-      indexAxis: 'y', 
-      plugins: { 
-        legend: { display: false } 
-      }, 
-      scales: { 
-        x: { beginAtZero: true } 
-      } 
-    }
-  });
-}
-
-/* ===== COLUMN MANAGEMENT ===== */
-function showColumnModal() {
-  const modal = $("#modal-columns");
-  const columnList = $("#column-list");
-  
-  columnList.innerHTML = "";
-  
-  state.last.headers.forEach(column => {
-    const div = document.createElement("div");
-    div.className = "column-toggle";
-    
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.id = `col-${column}`;
-    input.checked = state.visibleColumns.includes(column);
-    
-    const label = document.createElement("label");
-    label.htmlFor = `col-${column}`;
-    label.textContent = column;
-    
-    div.appendChild(input);
-    div.appendChild(label);
-    columnList.appendChild(div);
-  });
-  
-  modal.classList.remove("hidden");
-}
-
-function applyColumnSelection() {
-  const checkboxes = document.querySelectorAll('#column-list input[type="checkbox"]');
-  state.visibleColumns = [];
-  
-  checkboxes.forEach(cb => {
-    if (cb.checked) {
-      const column = cb.id.replace('col-', '');
-      state.visibleColumns.push(column);
-    }
-  });
-  
-  drawTable();
-  $("#modal-columns").classList.add("hidden");
-}
-
-function selectAllColumns() {
-  const checkboxes = document.querySelectorAll('#column-list input[type="checkbox"]');
-  checkboxes.forEach(cb => cb.checked = true);
-}
-
-function deselectAllColumns() {
-  const checkboxes = document.querySelectorAll('#column-list input[type="checkbox"]');
-  checkboxes.forEach(cb => cb.checked = false);
-}
-
-/* ===== EXPORTS ===== */
-function showExcelModal() {
-  const modal = $("#modal-excel");
-  const columnList = $("#excel-column-list");
-  
-  columnList.innerHTML = "";
-  
-  state.last.headers.forEach(column => {
-    const div = document.createElement("div");
-    div.className = "column-toggle";
-    
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.id = `excel-col-${column}`;
-    input.checked = state.visibleColumns.includes(column);
-    
-    const label = document.createElement("label");
-    label.htmlFor = `excel-col-${column}`;
-    label.textContent = column;
-    
-    div.appendChild(input);
-    div.appendChild(label);
-    columnList.appendChild(div);
-  });
-  
-  // Set default title
-  const form = $("#form-type").options[$("#form-type").selectedIndex].text;
-  $("#excel-title").value = `${form} Report - ${new Date().toISOString().slice(0, 10)}`;
-  
-  modal.classList.remove("hidden");
-}
-
-function exportToExcel() {
-  const title = $("#excel-title").value || "Safety Report";
-  
-  if (!state.last.headers.length || !state.last.rows.length) {
-    alert("No data to export.");
-    return;
-  }
-  
-  // Get selected columns from modal
-  const checkboxes = document.querySelectorAll('#excel-column-list input[type="checkbox"]');
-  const exportColumns = [];
-  
-  checkboxes.forEach(cb => {
-    if (cb.checked) {
-      const column = cb.id.replace('excel-col-', '');
-      exportColumns.push(column);
-    }
-  });
-  
-  if (exportColumns.length === 0) {
-    alert("Please select at least one column to export.");
-    return;
-  }
-  
-  // Create worksheet with selected columns
-  const visibleHeaders = state.last.headers.filter(h => exportColumns.includes(h));
-  const visibleData = state.last.rows.map(row => {
-    const visibleRow = [];
-    state.last.headers.forEach((h, idx) => {
-      if (exportColumns.includes(h)) {
-        visibleRow.push(row[idx]);
-      }
+  // month
+  $("#chart-month-card").style.display = monthCounts.length ? "block":"none";
+  if(monthCounts.length){
+    state.charts.month = new Chart($("#chart-month"), {
+      type:"bar",
+      data:{ labels:monthCounts.map(x=>x[0]), datasets:[{label:"Records", data:monthCounts.map(x=>x[1])}] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
     });
-    return visibleRow;
+  }
+  // locations
+  $("#chart-loc-card").style.display = topL.length ? "block":"none";
+  if(topL.length){
+    state.charts.loc = new Chart($("#chart-loc"), {
+      type:"bar",
+      data:{ labels:topL.map(x=>x[0]), datasets:[{label:"Records", data:topL.map(x=>x[1])}] },
+      options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true}} }
+    });
+  }
+}
+
+/* ===== COLUMN VISIBILITY ===== */
+function openColsModal(){
+  const m=$("#modal-cols"), list=$("#cols-list"); list.innerHTML="";
+  if(!state.headers.length){ list.innerHTML="<div class='muted'>Run a report first.</div>"; m.style.display="flex"; return; }
+  state.headers.forEach(h=>{
+    const wrap=document.createElement("label"); wrap.className="btn"; wrap.style.justifyContent="space-between";
+    const span=document.createElement("span"); span.textContent=h;
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.checked = state.visible[h]!==false;
+    cb.addEventListener("change",()=>{ state.visible[h]=cb.checked; });
+    wrap.appendChild(span); wrap.appendChild(cb); list.appendChild(wrap);
   });
-  
-  const ws = XLSX.utils.aoa_to_sheet([visibleHeaders, ...visibleData]);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Safety Report");
-  
-  // Generate filename
-  const filename = `${title.replace(/\s+/g, '_')}.xlsx`;
-  
-  XLSX.writeFile(wb, filename);
-  $("#modal-excel").classList.add("hidden");
+  m.style.display="flex";
+}
+function colsApply(){ $("#modal-cols").style.display="none"; drawTable(); }
+function colsAll(){ state.headers.forEach(h=> state.visible[h]=true); openColsModal(); }
+function colsNone(){ state.headers.forEach(h=> state.visible[h]=false); openColsModal(); }
+
+/* ===== EXCEL EXPORT ===== */
+function openExcelModal(){
+  if(!state.rows.length){ alert("No data."); return; }
+  $("#xlsx-title").value = `${$("#form-type").options[$("#form-type").selectedIndex].text} Report - ${new Date().toISOString().slice(0,10)}`;
+  $("#modal-xlsx").style.display="flex";
+}
+function exportExcel(){
+  const title = $("#xlsx-title").value || "Safety Report";
+  const hdr = state.headers.filter(h => state.visible[h]!==false);
+  if(!hdr.length){ alert("Select at least one column."); return; }
+  const matrix = state.rows.map(r => {
+    const out=[]; state.headers.forEach((h,i)=>{ if(state.visible[h]!==false) out.push(r[i]); });
+    return out;
+  });
+  const ws = XLSX.utils.aoa_to_sheet([hdr, ...matrix]);
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Report");
+  XLSX.writeFile(wb, `${title.replace(/\s+/g,'_')}.xlsx`);
+  $("#modal-xlsx").style.display="none";
 }
 
-function showPdfModal() {
-  $("#modal-pdf").classList.remove("hidden");
+/* ===== PDF EXPORT (Print) ===== */
+function openPdfModal(){
+  if(!state.rows.length){ alert("No data."); return; }
+  $("#pdf-title").value = `${$("#form-type").options[$("#form-type").selectedIndex].text} Report`;
+  $("#pdf-notes").value = "";
+  $("#pdf-month").checked = true; $("#pdf-loc").checked = true;
+  $("#modal-pdf").style.display="flex";
 }
+function exportPdf(){
+  const mOn = $("#pdf-month").checked, lOn = $("#pdf-loc").checked;
+  // add temp title/notes at top via print header block
+  const title = $("#pdf-title").value.trim();
+  const notes = $("#pdf-notes").value.trim();
+  const header = document.createElement("div");
+  header.className="card chart-card"; header.id="pdf-topnote";
+  header.innerHTML = `<div class="head"><div class="title">${title||"Safety Report"}</div></div>
+    <div class="body">${notes ? `<div style="white-space:pre-wrap;color:var(--muted)">${notes}</div>` : `<div class="muted">Generated ${new Date().toLocaleString()}</div>`}</div>`;
+  const content = document.querySelector(".panel .grid"); content.prepend(header);
 
-function generatePdf() {
-  // In a real implementation, you would use a library like jsPDF or html2pdf
-  // For this example, we'll just use the browser's print function
-  
-  const title = $("#pdf-title").value || "Safety Report";
-  const notes = $("#pdf-notes").value;
-  
-  // Show a temporary message
-  const status = $("#run-status");
-  setStatus(status, "Generating PDF report...", "success");
-  
-  // In a real implementation, you would:
-  // 1. Create a new window or iframe
-  // 2. Build the PDF content with selected charts
-  // 3. Use a library to generate the PDF
-  
-  // For now, we'll just print the page
-  setTimeout(() => {
-    window.print();
-    setStatus(status, "PDF generation complete", "success");
-  }, 1000);
-  
-  $("#modal-pdf").classList.add("hidden");
+  // toggle chart visibility for print using class
+  $("#chart-month-card").classList.toggle("chart-skip", !mOn);
+  $("#chart-loc-card").classList.toggle("chart-skip", !lOn);
+
+  $("#modal-pdf").style.display="none";
+  window.print();
+
+  // cleanup
+  $("#chart-month-card").classList.remove("chart-skip");
+  $("#chart-loc-card").classList.remove("chart-skip");
+  header.remove();
 }
 
 /* ===== BOOT ===== */
-function boot() {
-  // Wire UI events
+function boot(){
+  // wire buttons
   $("#btn-login").addEventListener("click", doLogin);
-  $("#login-pass").addEventListener("keydown", e => { 
-    if (e.key === "Enter") doLogin(); 
-  });
-  
-  $("#btn-run").addEventListener("click", runReport);
-  $("#btn-columns").addEventListener("click", showColumnModal);
-  $("#btn-excel").addEventListener("click", showExcelModal);
-  $("#btn-pdf").addEventListener("click", showPdfModal);
-  
-  $("#btn-logout").addEventListener("click", () => {
-    clearSession(); 
-    paintUser(); 
-    show("#view-login");
-  });
-  
-  // Modal events
-  $("#modal-columns .modal-close").addEventListener("click", () => {
-    $("#modal-columns").classList.add("hidden");
-  });
-  
-  $("#btn-apply-columns").addEventListener("click", applyColumnSelection);
-  $("#btn-select-all").addEventListener("click", selectAllColumns);
-  $("#btn-deselect-all").addEventListener("click", deselectAllColumns);
-  
-  $("#modal-excel .modal-close").addEventListener("click", () => {
-    $("#modal-excel").classList.add("hidden");
-  });
-  
-  $("#btn-cancel-excel").addEventListener("click", () => {
-    $("#modal-excel").classList.add("hidden");
-  });
-  
-  $("#btn-export-excel").addEventListener("click", exportToExcel);
-  
-  $("#modal-pdf .modal-close").addEventListener("click", () => {
-    $("#modal-pdf").classList.add("hidden");
-  });
-  
-  $("#btn-cancel-pdf").addEventListener("click", () => {
-    $("#modal-pdf").classList.add("hidden");
-  });
-  
-  $("#btn-generate-pdf").addEventListener("click", generatePdf);
-  
-  // Filter change events (debounced to avoid too many API calls)
-  const debouncedRunReport = debounce(runReport, 500);
-  $("#location-filter").addEventListener("change", debouncedRunReport);
-  
-  // Initialize
-  loadSession();
-  paintUser();
-  
-  if (state.token) { 
-    show("#view-dash"); 
-    initDates();
-  } else { 
-    show("#view-login"); 
-  }
-}
+  $("#login-pass").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
 
-// Start the application
+  $("#btn-run").addEventListener("click", runReport);
+  $("#btn-logout").addEventListener("click", ()=>{ clearSession(); paintUser(); show("#view-login"); });
+
+  $("#btn-col-manage").addEventListener("click", openColsModal);
+  $("#cols-close").addEventListener("click", ()=> $("#modal-cols").style.display="none");
+  $("#cols-apply").addEventListener("click", colsApply);
+  $("#cols-all").addEventListener("click", colsAll);
+  $("#cols-none").addEventListener("click", colsNone);
+
+  $("#btn-excel").addEventListener("click", openExcelModal);
+  $("#xlsx-close").addEventListener("click", ()=> $("#modal-xlsx").style.display="none");
+  $("#xlsx-cancel").addEventListener("click", ()=> $("#modal-xlsx").style.display="none");
+  $("#xlsx-go").addEventListener("click", exportExcel);
+
+  $("#btn-pdf").addEventListener("click", openPdfModal);
+  $("#pdf-close").addEventListener("click", ()=> $("#modal-pdf").style.display="none");
+  $("#pdf-cancel").addEventListener("click", ()=> $("#modal-pdf").style.display="none");
+  $("#pdf-go").addEventListener("click", exportPdf);
+
+  loadSession(); paintUser();
+  if(state.token){ show("#view-dash"); initDates(); }
+  else{ show("#view-login"); }
+}
 boot();
 </script>
-
 </body>
 </html>
