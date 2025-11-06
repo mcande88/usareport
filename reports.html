@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Safety Analytics • ArborGen</title>
   <link rel="icon" type="image/png" href="icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #1a472a;
@@ -33,7 +34,7 @@
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
@@ -226,15 +227,21 @@
     }
 
     /* Charts */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .charts-container {
+      display: flex;
+      flex-direction: column;
       gap: 20px;
       margin-bottom: 20px;
     }
 
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
     @media (max-width: 768px) {
-      .charts-grid {
+      .chart-row {
         grid-template-columns: 1fr;
       }
     }
@@ -557,27 +564,6 @@
             </select>
           </div>
 
-          <div class="filter-group">
-            <label for="status-filter">Status</label>
-            <select id="status-filter">
-              <option value="">All Statuses</option>
-              <option value="open">Open</option>
-              <option value="closed">Closed</option>
-              <option value="investigation">Under Investigation</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="severity-filter">Severity</label>
-            <select id="severity-filter">
-              <option value="">All Severities</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="critical">Critical</option>
-            </select>
-          </div>
-
           <button id="btn-run" class="btn btn-primary" style="width: 100%;">Generate Report</button>
           <div id="run-status" class="status-message mt-2 hidden"></div>
         </div>
@@ -600,47 +586,27 @@
         </div>
 
         <!-- Charts -->
-        <div class="charts-grid">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Incidents by Month</div>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="chart-month"></canvas>
+        <div class="charts-container">
+          <div class="chart-row">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Incidents by Month</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-month"></canvas>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Incidents by Location</div>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="chart-loc"></canvas>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Incidents by Location</div>
               </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Incidents by Type</div>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="chart-type"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Severity Distribution</div>
-            </div>
-            <div class="card-body">
-              <div class="chart-container">
-                <canvas id="chart-severity"></canvas>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-loc"></canvas>
+                </div>
               </div>
             </div>
           </div>
@@ -693,6 +659,31 @@
   </div>
 </div>
 
+<!-- Excel Options Modal -->
+<div id="modal-excel" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Excel Export Options</div>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="excel-title">Report Title</label>
+        <input type="text" id="excel-title" value="Safety Report" placeholder="Enter report title">
+      </div>
+      <p class="text-muted mb-2">Select which columns to include in the export:</p>
+      <div id="excel-column-list">
+        <!-- Will be populated dynamically -->
+      </div>
+      <p class="text-muted mt-2">Note: Only selected columns will be included in the export.</p>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-cancel-excel" class="btn btn-outline">Cancel</button>
+      <button id="btn-export-excel" class="btn btn-primary">Export to Excel</button>
+    </div>
+  </div>
+</div>
+
 <!-- PDF Options Modal -->
 <div id="modal-pdf" class="modal-overlay hidden">
   <div class="modal">
@@ -701,6 +692,10 @@
       <button class="modal-close">&times;</button>
     </div>
     <div class="modal-body">
+      <div class="form-group">
+        <label for="pdf-title">Report Title</label>
+        <input type="text" id="pdf-title" value="Safety Report" placeholder="Enter report title">
+      </div>
       <p class="text-muted mb-2">Select which charts to include in the PDF report:</p>
       <div class="column-toggle">
         <input type="checkbox" id="pdf-chart-month" checked>
@@ -710,21 +705,8 @@
         <input type="checkbox" id="pdf-chart-loc" checked>
         <label for="pdf-chart-loc">Incidents by Location</label>
       </div>
-      <div class="column-toggle">
-        <input type="checkbox" id="pdf-chart-type" checked>
-        <label for="pdf-chart-type">Incidents by Type</label>
-      </div>
-      <div class="column-toggle">
-        <input type="checkbox" id="pdf-chart-severity" checked>
-        <label for="pdf-chart-severity">Severity Distribution</label>
-      </div>
       
       <div class="mt-3">
-        <label for="pdf-title">Report Title</label>
-        <input type="text" id="pdf-title" value="Safety Report" placeholder="Enter report title">
-      </div>
-      
-      <div class="mt-2">
         <label for="pdf-notes">Additional Notes</label>
         <textarea id="pdf-notes" rows="3" style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;" placeholder="Add any additional notes or comments"></textarea>
       </div>
@@ -748,15 +730,13 @@ let state = {
   role: null,
   allowed: "*",
   last: { headers: [], rows: [], rawData: [] },
-  charts: { month: null, loc: null, type: null, severity: null },
+  charts: { month: null, loc: null },
   visibleColumns: [],
   filters: {
     formType: "employee_first",
     dateFrom: null,
     dateTo: null,
-    location: "",
-    status: "",
-    severity: ""
+    location: ""
   }
 };
 
@@ -924,8 +904,6 @@ async function runReport() {
   const date_from = $("#date-from").value || null;
   const date_to = $("#date-to").value || null;
   const location = $("#location-filter").value;
-  const statusFilter = $("#status-filter").value;
-  const severity = $("#severity-filter").value;
 
   try {
     const res = await apiPost('list', { 
@@ -950,18 +928,6 @@ async function runReport() {
     if (location) {
       filteredData = filteredData.filter(row => 
         row.location && row.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-    
-    if (statusFilter) {
-      filteredData = filteredData.filter(row => 
-        row.status && row.status.toLowerCase() === statusFilter.toLowerCase()
-      );
-    }
-    
-    if (severity) {
-      filteredData = filteredData.filter(row => 
-        row.severity && row.severity.toLowerCase() === severity.toLowerCase()
       );
     }
     
@@ -1078,8 +1044,6 @@ function drawCharts() {
   if (!H.length || !rawData.length) {
     destroyChart(state.charts.month);
     destroyChart(state.charts.loc);
-    destroyChart(state.charts.type);
-    destroyChart(state.charts.severity);
     return;
   }
   
@@ -1169,108 +1133,6 @@ function drawCharts() {
       } 
     }
   });
-  
-  // Chart 3: Incidents by Type
-  const typeCols = ["incident_type", "type", "category", "form_type"];
-  let tIdx = -1;
-  for (const cand of typeCols) {
-    if (H.includes(cand)) {
-      tIdx = H.indexOf(cand);
-      break;
-    }
-  }
-  
-  const typeCounts = tIdx > -1 ? groupBy(rawData, row => {
-    const v = String(row[H[tIdx]] || "").trim();
-    return v || "Unspecified";
-  }) : [];
-  
-  const ctxT = document.getElementById("chart-type").getContext("2d");
-  destroyChart(state.charts.type);
-  state.charts.type = new Chart(ctxT, {
-    type: "doughnut",
-    data: {
-      labels: typeCounts.map(x => x[0]),
-      datasets: [{ 
-        label: "Records", 
-        data: typeCounts.map(x => x[1]),
-        backgroundColor: [
-          "rgba(26, 71, 42, 0.7)",
-          "rgba(64, 145, 108, 0.7)",
-          "rgba(82, 183, 136, 0.7)",
-          "rgba(149, 213, 178, 0.7)",
-          "rgba(195, 231, 211, 0.7)"
-        ],
-        borderColor: [
-          "rgba(26, 71, 42, 1)",
-          "rgba(64, 145, 108, 1)",
-          "rgba(82, 183, 136, 1)",
-          "rgba(149, 213, 178, 1)",
-          "rgba(195, 231, 211, 1)"
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: { 
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { 
-        legend: { 
-          position: 'right'
-        } 
-      }
-    }
-  });
-  
-  // Chart 4: Severity Distribution
-  const severityCols = ["severity", "severity_level", "risk_level"];
-  let sIdx = -1;
-  for (const cand of severityCols) {
-    if (H.includes(cand)) {
-      sIdx = H.indexOf(cand);
-      break;
-    }
-  }
-  
-  const severityCounts = sIdx > -1 ? groupBy(rawData, row => {
-    const v = String(row[H[sIdx]] || "").trim();
-    return v || "Unspecified";
-  }) : [];
-  
-  const ctxS = document.getElementById("chart-severity").getContext("2d");
-  destroyChart(state.charts.severity);
-  state.charts.severity = new Chart(ctxS, {
-    type: "pie",
-    data: {
-      labels: severityCounts.map(x => x[0]),
-      datasets: [{ 
-        label: "Records", 
-        data: severityCounts.map(x => x[1]),
-        backgroundColor: [
-          "rgba(40, 167, 69, 0.7)",   // Green for low
-          "rgba(255, 193, 7, 0.7)",   // Yellow for medium
-          "rgba(253, 126, 20, 0.7)",  // Orange for high
-          "rgba(220, 53, 69, 0.7)"    // Red for critical
-        ],
-        borderColor: [
-          "rgba(40, 167, 69, 1)",
-          "rgba(255, 193, 7, 1)",
-          "rgba(253, 126, 20, 1)",
-          "rgba(220, 53, 69, 1)"
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: { 
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { 
-        legend: { 
-          position: 'right'
-        } 
-      }
-    }
-  });
 }
 
 /* ===== COLUMN MANAGEMENT ===== */
@@ -1327,18 +1189,67 @@ function deselectAllColumns() {
 }
 
 /* ===== EXPORTS ===== */
+function showExcelModal() {
+  const modal = $("#modal-excel");
+  const columnList = $("#excel-column-list");
+  
+  columnList.innerHTML = "";
+  
+  state.last.headers.forEach(column => {
+    const div = document.createElement("div");
+    div.className = "column-toggle";
+    
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.id = `excel-col-${column}`;
+    input.checked = state.visibleColumns.includes(column);
+    
+    const label = document.createElement("label");
+    label.htmlFor = `excel-col-${column}`;
+    label.textContent = column;
+    
+    div.appendChild(input);
+    div.appendChild(label);
+    columnList.appendChild(div);
+  });
+  
+  // Set default title
+  const form = $("#form-type").options[$("#form-type").selectedIndex].text;
+  $("#excel-title").value = `${form} Report - ${new Date().toISOString().slice(0, 10)}`;
+  
+  modal.classList.remove("hidden");
+}
+
 function exportToExcel() {
+  const title = $("#excel-title").value || "Safety Report";
+  
   if (!state.last.headers.length || !state.last.rows.length) {
     alert("No data to export.");
     return;
   }
   
-  // Create worksheet with only visible columns
-  const visibleHeaders = state.last.headers.filter(h => state.visibleColumns.includes(h));
+  // Get selected columns from modal
+  const checkboxes = document.querySelectorAll('#excel-column-list input[type="checkbox"]');
+  const exportColumns = [];
+  
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      const column = cb.id.replace('excel-col-', '');
+      exportColumns.push(column);
+    }
+  });
+  
+  if (exportColumns.length === 0) {
+    alert("Please select at least one column to export.");
+    return;
+  }
+  
+  // Create worksheet with selected columns
+  const visibleHeaders = state.last.headers.filter(h => exportColumns.includes(h));
   const visibleData = state.last.rows.map(row => {
     const visibleRow = [];
     state.last.headers.forEach((h, idx) => {
-      if (state.visibleColumns.includes(h)) {
+      if (exportColumns.includes(h)) {
         visibleRow.push(row[idx]);
       }
     });
@@ -1350,11 +1261,10 @@ function exportToExcel() {
   XLSX.utils.book_append_sheet(wb, ws, "Safety Report");
   
   // Generate filename
-  const form = $("#form-type").options[$("#form-type").selectedIndex].text.replace(/\s+/g, '_');
-  const date = new Date().toISOString().slice(0, 10);
-  const filename = `Safety_Report_${form}_${date}.xlsx`;
+  const filename = `${title.replace(/\s+/g, '_')}.xlsx`;
   
   XLSX.writeFile(wb, filename);
+  $("#modal-excel").classList.add("hidden");
 }
 
 function showPdfModal() {
@@ -1364,7 +1274,6 @@ function showPdfModal() {
 function generatePdf() {
   // In a real implementation, you would use a library like jsPDF or html2pdf
   // For this example, we'll just use the browser's print function
-  // and hide the elements that shouldn't be in the PDF
   
   const title = $("#pdf-title").value || "Safety Report";
   const notes = $("#pdf-notes").value;
@@ -1397,7 +1306,7 @@ function boot() {
   
   $("#btn-run").addEventListener("click", runReport);
   $("#btn-columns").addEventListener("click", showColumnModal);
-  $("#btn-excel").addEventListener("click", exportToExcel);
+  $("#btn-excel").addEventListener("click", showExcelModal);
   $("#btn-pdf").addEventListener("click", showPdfModal);
   
   $("#btn-logout").addEventListener("click", () => {
@@ -1415,6 +1324,16 @@ function boot() {
   $("#btn-select-all").addEventListener("click", selectAllColumns);
   $("#btn-deselect-all").addEventListener("click", deselectAllColumns);
   
+  $("#modal-excel .modal-close").addEventListener("click", () => {
+    $("#modal-excel").classList.add("hidden");
+  });
+  
+  $("#btn-cancel-excel").addEventListener("click", () => {
+    $("#modal-excel").classList.add("hidden");
+  });
+  
+  $("#btn-export-excel").addEventListener("click", exportToExcel);
+  
   $("#modal-pdf .modal-close").addEventListener("click", () => {
     $("#modal-pdf").classList.add("hidden");
   });
@@ -1428,8 +1347,6 @@ function boot() {
   // Filter change events (debounced to avoid too many API calls)
   const debouncedRunReport = debounce(runReport, 500);
   $("#location-filter").addEventListener("change", debouncedRunReport);
-  $("#status-filter").addEventListener("change", debouncedRunReport);
-  $("#severity-filter").addEventListener("change", debouncedRunReport);
   
   // Initialize
   loadSession();
